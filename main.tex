@@ -59,8 +59,15 @@
 %% an example:
 \usepackage{natbib}
 
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+
 %% Information about the title, etc.
-\title{Towards Alleviating The Task Of Manual Software Parallelisation}
+\title{
+{Towards Alleviating The Software Parallelization Task}\\
+{}\\
+{\includegraphics[width=50mm,scale=0.5]{eushield-normal.pdf}}
+}
 \author{Aleksandr Maramzin}
 
 %% If the year of submission is not the current year, uncomment this line and 
@@ -111,9 +118,13 @@ Igor, my faithful lab assistant.
 %% Include your chapter files here. See the sample chapter file for the basic
 %% format.
 
-\include{chap1}
+\include{chapters/introduction}
 % \include{chap2}
 %% ... etc ...
+
+\include{chapters/assistant}
+
+\include{chapters/frameworks}
 
 %%%%%%%%
 %% Any appendices should go here. The appendix files should look just like the
