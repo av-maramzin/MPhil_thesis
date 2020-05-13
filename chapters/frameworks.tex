@@ -24,17 +24,62 @@ sequential program a programmer can work with its instructions directly by
 \quad Software design patterns are reusable solutions to common design problems in object-oriented software engineering. They live at the level higher than that of a source code and are language agnostic. The solutions can be regarded as standard solutions to design problems they target. These solutions have been well tested and proven to be the most reliable and elegant.
 
 Chain of responsibility pattern is very similar to fold.
-
+Visitor pattern roughly corresponds to fold.
 
 \subsection{Imperative and Functional programming}
 \quad Programming languages can be classified by different programming paradigms they support. Among the most general classifications are imperative and declarative programming paradigms.\newline\null
 \quad Imperative programs are written in a form of instruction sequences, which read and write the state of a program. The concept of state is the main characteristic of imperative programming paradigm. Instruction sequences can be structured in various ways. In procedural programming paradigm instructions are grouped inside procedures and functions. In object-oriented programming (OOP) paradigm instructions are grouped with the data they operate on inside objects of various types or classes.\newline\null
-\quad Declarative programs do not specify the exact sequence of steps and state updates a program needs to do in order to get the desired result. Declarative programs declare the properties of the desired result. The properties can be specified as a set of constraints like in constraint programming or a set of linear inequalities like in linear programming. Functional programming is another subtype of declarative programming. In functional programming the final desired result is specified as a sequence of stateless function evaluations. Among the most common functions are map, reduce, fold, etc.       
+\quad Declarative programs do not specify the exact sequence of steps and state updates a program needs to do in order to get the desired result. Declarative programs declare the properties of the desired result. The properties can be specified as a set of constraints like in constraint programming or a set of linear inequalities like in linear programming. Functional programming is another subtype of declarative programming. In functional programming the final desired result is specified as a sequence of stateless function evaluations. Among the most common functions are map, reduce, fold, etc.
+
 \subsection{Parallel Algorithmic Skeletons}
 
+
+
+
 \section{Computational Frameworks}
+\quad In our project we propose a C++ template library of computational frameworks. Computational frameworks are a blend of imperative and functional programming paradigms. 
+
+User-exposed methods of classes are higher-order functions and can take custom function objects, function pointers, lambda functions and apply them to framework elements in a framework defined way. Unlike pure functions the application of user-defined functions to our computational frameworks can have side-effects.
+
+\quad Improves structuredness, modularity, separation of concerns. 
+
+
+
+
 
 \subsection{Software Design}
+\quad Our computational frameworks are designed as C++ class templates.
+
+\begin{minipage}[t]{\linewidth}
+\begin{lstlisting}[caption={Computational framework class template skeleton},label={lst:framework_template_skeleton},language=C++]
+
+template <typename ElemType, typename SeedType>
+class Framework {
+    public:
+        class Element {
+            // user-exposed customization iface 
+        };
+        void grow(size_t size, SeedType seed) {
+            // organise framework elements 
+            // into a data structure
+            ... = new ElemType(); 
+        }
+        template<typename RetType, typename FuncType>
+        RetType compute(FuncType application_func);
+    private:
+        // framework data structure organisation
+        // (list, tree, array, etc.)
+};
+
+\end{lstlisting}
+\end{minipage}
+
+\quad The design and the implementation of our template library reflect the target goals of the concept of computational frameworks.     
+
+\quad There were several questions raised in the design process of a template library. 
+
+
+
 
 \subsection{Fractal}
 \quad The fractal computational framework
@@ -42,6 +87,8 @@ Chain of responsibility pattern is very similar to fold.
 
 
 \subsection{Fold}
+\quad Fold abstracts away common patterns of recursion.
+
 
 \subsection{Reduce}
 
