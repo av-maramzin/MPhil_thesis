@@ -37,17 +37,17 @@ Visitor pattern roughly corresponds to fold.
 
 
 \section{Computational Frameworks}
-\quad In our project we propose a C++ template library of computational frameworks. Computational frameworks are a blend of imperative and functional programming paradigms. 
+\quad In our project we propose a C++ library of computational frameworks. Computational frameworks are a blend of imperative, object-oriented and functional programming paradigms. They lift algorithm implementation in the C++ language to a higher level.  
 
 User-exposed methods of classes are higher-order functions and can take custom function objects, function pointers, lambda functions and apply them to framework elements in a framework defined way. Unlike pure functions the application of user-defined functions to our computational frameworks can have side-effects.
 
-\quad Improves structuredness, modularity, separation of concerns. 
+\quad Improves structuredness, modularity, separation of concerns and hides possible program parallelization behind the convenient user API.  
 
 
 
 
 
-\subsection{Software Design}
+\subsection{Frameworks Library Design}
 \quad Our computational frameworks are designed as C++ class templates.
 
 \begin{minipage}[t]{\linewidth}
@@ -57,15 +57,24 @@ template <typename ElemType, typename SeedType>
 class Framework {
     public:
         class Element {
-            // user-exposed customization iface 
+            // user-exposed customization iface
+            virtual void grow(SeedType) = 0;
+            virtual bool growth_stop_condition() { return false; };
         };
+        template <typename ComputeType>
+        class ComputeFunction {
+            // framework specific application function API
+            virtual operator()(ElemType& elem, ... ) = 0;
+*       };
+   /     
         void grow(size_t size, SeedType seed) {
             // organise framework elements 
             // into a data structure
             ... = new ElemType(); 
         }
-        template<typename RetType, typename FuncType>
-        RetType compute(FuncType application_func);
+        template<typename ComputeType>
+        ComputeType compute(ComputeFunction<ComputeType>& apply_func);
+    
     private:
         // framework data structure organisation
         // (list, tree, array, etc.)
@@ -74,7 +83,7 @@ class Framework {
 \end{lstlisting}
 \end{minipage}
 
-\quad The design and the implementation of our template library reflect the target goals of the concept of computational frameworks.     
+\quad The design and the implementation of our template library reflect the target goals of the concept of computational frameworks.    
 
 \quad There were several questions raised in the design process of a template library. 
 
