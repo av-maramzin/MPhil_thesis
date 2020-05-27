@@ -37,18 +37,35 @@ Visitor pattern roughly corresponds to fold.
 
 
 \section{Computational Frameworks}
-\quad In our project we propose a C++ library of computational frameworks. Computational frameworks are a blend of imperative, object-oriented and functional programming paradigms. They lift algorithm implementation in the C++ language to a higher level.  
+\quad In this work we propose an idea of \textbf{computational frameworks} and we show its utility and use on a subset of Olden benchmarks. The idea grows on a wide review of the available parallel software development methodologies as well as on the understanding of problems in the task of software parallelization.  
+
+\subsection{Overview}
+\quad In our project we propose a C++ library of computational frameworks. Computational frameworks are a blend of imperative, object-oriented and functional programming paradigms. They lift algorithm implementation in the C++ language to a higher level.
+Computational frameworks are a blend of algorithms and data structures as well as several programming paradigms such as imperative, object-oriented and functional programming. They lift C++ program implementations to a higher conceptual level. 
 
 User-exposed methods of classes are higher-order functions and can take custom function objects, function pointers, lambda functions and apply them to framework elements in a framework defined way. Unlike pure functions the application of user-defined functions to our computational frameworks can have side-effects.
 
 \quad Improves structuredness, modularity, separation of concerns and hides possible program parallelization behind the convenient user API.  
 
+\subsection{Fractal}
+\quad The \textbf{Fractal} computational framework has been inspired by the theoretical work on tree reductions [] and 3 Olden benchmarks (health, treeadd, perimeter). Figure \ref{fig:fractal} illustrates the Fractal functionality.\newline\null
+\quad There are numerous data structures, computational patterns, processes and examples, which can be characterized as being fractals.\newline\null
+\quad The simplest example of fractal is an n-ary tree. Imagine we store some data at every node of the tree and want to accumulate it starting from the leaves at the very bottom and going all the way up to the root of the tree. Accumulation procedure processes every node by taking the result from all its children, making a computation and passing the result up to the parent element. The procedure may have some side-effects on the nodes and keeps the whole tree data structure along with its state in memory. In that sense it is not a stateless functional programming. At the same time the accumulation procedure can be passed as an argument to a higher-order compute function. The movement of data through the nodes of the tree from their children to their parents is the fixed and immutable part of an algorithm, whereas the accumulation procedure can be given as a parameter. The latter separates the algorithm into a well-structured user and library parts. The library part acts as a backbone and the user part grows on it. The computations described above lie at the basis of health and treeadd benchmarks.\newline\null
+\begin{figure}[ht]
+\includegraphics[width=1.0\textwidth]{images/Fractal.pdf}
+\caption{The Fractal computational framework.}
+\label{fig:fractal}
+\end{figure}
+\quad A more complicated and interesting fractal example would be a square being continuously and recursively divided into 4 equal sub-squares (southwest, northwest, southeast and northeast). The deep-growing structure is actually a 4-ary tree as well. Imagine one wants to compute the perimeter of some figure. One way to do it would be to map the figure on the square plane and then turn the plane into a grid by continuously splitting the square into 4 equal sub-parts (southwest, northwest, southeast, northeast) till we reach the granularity size of the grid. Then we paint all the grid elements located inside the figure shape as black and those outside of it as white. We iterate over the grid and detect all points of color flips and add the size of the grid elements to the final sum, which at the end is going to approximate the perimeter of the figure. That is roughly what the perimeter benchmark does.\newline\null
+\quad In all its generality the fractal is a pattern, which can be characterized with self-similarity, repeatedness, structuredness, inherent parallelizability and the exact numeric values such as its depth and arity. All that naturally maps onto the C++ implementation as a class template we describe below.
+\subsection{Fold}
 
+\subsection{Reduce}
 
 
 
 \subsection{Frameworks Library Design}
-\quad Our computational frameworks are designed as C++ class templates.
+\quad The computational frameworks are designed as a set of C++ class templates. The user interface these templates provide has been designed and refined iteratively using the set of Olden benchmarks [].     
 
 \begin{minipage}[t]{\linewidth}
 \begin{lstlisting}[caption={Computational framework class template skeleton},label={lst:framework_template_skeleton},language=C++]
@@ -59,12 +76,13 @@ class Framework {
         class Element {
             // user-exposed customization iface
             virtual void grow(SeedType) = 0;
-            virtual bool growth_stop_condition() { return false; };
+            virtual bool growth_stop_condition() { return false; }
         };
         template <typename ComputeType>
         class ComputeFunction {
             // framework specific application function API
             virtual operator()(ElemType& elem, ... ) = 0;
+            virtual operator(const std::vector<ComputeType>&) = 0;
 *       };
    /     
         void grow(size_t size, SeedType seed) {
