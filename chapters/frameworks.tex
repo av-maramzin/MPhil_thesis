@@ -59,12 +59,22 @@ User-exposed methods of classes are higher-order functions and can take custom f
 \quad A more complicated and interesting fractal example would be a square being continuously and recursively divided into 4 equal sub-squares (southwest, northwest, southeast and northeast). The deep-growing structure is actually a 4-ary tree as well. Imagine one wants to compute the perimeter of some figure. One way to do it would be to map the figure on the square plane and then turn the plane into a grid by continuously splitting the square into 4 equal sub-parts (southwest, northwest, southeast, northeast) till we reach the granularity size of the grid. Then we paint all the grid elements located inside the figure shape as black and those outside of it as white. We iterate over the grid and detect all points of color flips and add the size of the grid elements to the final sum, which at the end is going to approximate the perimeter of the figure. That is roughly what the perimeter benchmark does.\newline\null
 \quad In all its generality the fractal is a pattern, which can be characterized with self-similarity, repeatedness, structuredness, inherent parallelizability and the exact numeric values such as its depth and arity. All that naturally maps onto the C++ implementation as a class template we describe below.
 \subsection{Fold}
+\quad The Fold computational framework has been inspired by the computation done in the power benchmark. The fold is not a new concept and has found a wide application in many functional languages. The C++ language provides std::accumulate() function template as a component of its Standard Template Library, which performs a functional fold over a given data structure, but contrary to our computational framework does not allow any side-effects and modifications to the elements of the data structure. Moreover, our C++ class template library provides an alternative interface to a user with an extensible customization space.\newline\null
+\begin{figure}[ht]
+\includegraphics[width=1.0\textwidth]{images/Fold.pdf}
+\caption{The Fold computational framework.}
+\label{fig:fractal}
+\end{figure}
+\quad One can think of a Fold as a set of elements arranged into a linked-list. We grow the list to the specified depth given a seed value. Then we may inject some data into the head of the list and propagate it to its tail element. All propagation modifications are user-defined. Once every element of the list is ready with its data, the computation starts at the tail element and passes computed values back to previous elements of the chain.         
+
 
 \subsection{Reduce}
 
 
 
 \subsection{Frameworks Library Design}
+\quad The design of the C++ computational frameworks library started with several goals  
+
 \quad The computational frameworks are designed as a set of C++ class templates. The user interface these templates provide has been designed and refined iteratively using the set of Olden benchmarks [].     
 
 \begin{minipage}[t]{\linewidth}
@@ -105,17 +115,9 @@ class Framework {
 
 \quad There were several questions raised in the design process of a template library. 
 
+\section{Performance of the library}
+\quad We have rewritten old legacy C implementations of 4 Olden benchmarks: health, perimeter, treeadd and power. The table below shows the performance gains our versions have over old sequential implementations.   
 
 
 
-\subsection{Fractal}
-\quad The fractal computational framework
-
-
-
-\subsection{Fold}
-\quad Fold abstracts away common patterns of recursion.
-
-
-\subsection{Reduce}
 
