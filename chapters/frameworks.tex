@@ -72,9 +72,16 @@ User-exposed methods of classes are higher-order functions and can take custom f
 
 
 
-\subsection{Frameworks Library Design}
-\quad The design of the C++ computational frameworks library started with several goals  
+\subsection{Frameworks Library Design and Implementation}
+\quad The design and implementation of computational frameworks library have been done iteratively using 4 Olden benchmarks as inspiration and  
+The design of the C++ computational frameworks library aims at several goals.  
+\begin{description}
+\item[Modern C++] The implementation of the library is based on the Standard Template Library (STL) data structures, uses move semantics and unique pointers to achieve efficiency and smart memory management. For parallelization library uses OpenMP standard. All that provides for a wide source-code portability. The library is composed of a set of header files with class templates, which are supposed to be included into the user application.  
+\item[Convenience] 
+\item[Coherence] All computational frameworks in the library share the same user interface as well as internal design. Frameworks are inter-operable and flexible: one can create say, a fold of fractals of reductions. Different components can compute different return types.
 
+\item[Sound design] CRTP, Algorithm Template pattern
+\end{description}
 \quad The computational frameworks are designed as a set of C++ class templates. The user interface these templates provide has been designed and refined iteratively using the set of Olden benchmarks [].     
 
 \begin{minipage}[t]{\linewidth}
