@@ -16,14 +16,14 @@
 As section \ref{parallel_computing_importance} says, the parallelism in hardware has become pervasive. To achieve the full performance potential of modern hardware the software has to be mapped onto that parallel hardware. The process of software parallelization has characteristically been a very manual task, which is complex, time-consuming and error-prone.     
 
 \subsection{Manual Parallelization Difficulties}
-\quad Software parallelization has characteristically been manual. 
+\quad Software parallelization has characteristically been a very manual process. As any software development process it consists of a number of stages and parts. The major problems are described below.
 \begin{description}
-\item[Problem understanding and partitioning]
+\item[Problem understanding and partitioning] As the best software engineering practice dictates, before diving into software development one needs to thoroughly understand the problem to be solved. One needs to decide on the requirements and restrictions the final piece of software must meet. The whole algorithm and software architecture might change with the decision of developing a parallel software version instead of a serial one. If one starts from an already implemented serial software version, the parallelization might be even more difficult to do. Source code comprehension is a hard task. The algorithm chosen for a serial version might be completely unsuitable for a parallel implementation.
 \item[Communications and synchronization]
 \item[Implementation and data dependencies]
-\item[Performance analysis and tuning]
+\item[Performance analysis and tuning] One needs to know where the program's hotspots are. Hotspots are the places where the most of the real work is being done. The majority of programs spend most of the CPU time in a few places. The task of a programmer is to find those places and concentrate all parallelization and optimization efforts right there. Finding hotspots might be difficult before the programmer has the whole program implemented. Modern hardware architectures have a multi level memory hierarchy, memory data prefetchers, TLBs, out-of-order execution, etc. It might be surprising how the actual program execution performance differs from the one inferred from the algorithm. Profilers and other analysis tools can be of help here.
 \end{description}
-
+\quad Finally, all the above challenges are interrelated and very often depend on each other. Parallel software development process can go iteratively with numerous dead ends and redesign efforts. With a long research history into the topic, all these problems are still actual now.
 \subsection{Limitations of Automatic Techniques}
 \quad There are various tools available to assist a programmer in the task of software parallelization. Parallelizing compilers are the most widely used.
 
@@ -59,17 +59,38 @@ We measured the running time of NASA Parallel Benchmarks after being compiled wi
 
 \subsection{Limits of Machine Learning based methods}
 \subsection{Data-Centric problem}
+\quad As it has already been stated the problem of software parallelisation is multifaceted. There is a vast range of lower level technical issues, which can turn a perfectly parallelisable at a higher level computation into a non-parallelisable implementation. In our ML assistant project (see Chapter \ref{chapter_ml_assistant}) we showed that the main reasons of Intel Compiler failures on SNU NPB benchmarks are alias analysis conservativeness, uninlined function calls and statically unresolvable dependencies. The assistant tool we designed targets these aspects of the software parallelisation problem. But, there are many more reasons leading to non-parallelisable algorithm implementations. Source code listings \ref{lst:array} and \ref{lst:list} brightly illustrate yet another unsolved problem.\newline\null
+\begin{minipage}[t]{0.45\linewidth}
+\begin{lstlisting}[caption={Parallelisable loop operating on a \textbf{linear array}.},label={lst:array},language=C]
+for (int i=0; i<n; it++) {
+  a[i]=a[i]+1;
+}
+\end{lstlisting}
+\end{minipage}
+%
+\begin{minipage}[t]{0.55\linewidth}
+\begin{lstlisting}[caption={Non-parallelisable loop operating on a \textbf{linked-list}.},label={lst:list},language=C]
+for (p=list; p!=NULL; p=p->next) {
+  p->value+=1;
+}
+\end{lstlisting}
+\end{minipage}
+\quad Listings \ref{lst:array} and \ref{lst:list} illustrate two alternative implementations of the same simple computation. We increment all sequence elements by one. Listing \ref{lst:array} implements the sequence with a regular array linearly laid out in the memory. Listing \ref{lst:list} chooses a linked list as an implementing data structure, which leads to a source code non-parallelisability.\newline\null
+\quad The DCP problem is not solved. Automatic methods are limited to relatively simple code bases such as libraries of well known data structures. The most successful methods rely on dynamic analysis and mamory graphs. Static techniques such as shape analysis are undecidable and highly conservative and might not finish in a reasonable time for the real software projects. Section [] gives a detailed literature review on the topic. 
+
+
 \subsection{Parallel Programming Models}
-\quad With a number of various hardware vendors entering the market with their different hardware architectures the portability became a serious concern.  
+\quad With a number of various hardware and operating system vendors entering the market with their different hardware architectures and system call interfaces software portability became a serious concern.   
 
 
-the emergence of various hardware vendors, diffrent hardware architectures  
 
-To combat the problem of software portability in the environment of growing number of different hardware architectures
+To combat the problem industry vendors and major organisation came to design industry standards such as POSIX, OpenMP and MPI. 
 
-\section{Software Parallelization Assistant}
+\section{Proposed Solution}
+\quad With all the problems described in the section [], we make a yet another step towards alleviating the challenging task of software parallelization. In our work we propose some ideas that might be elaborated further on. We prototype our ideas on the real benchmarks and show their potential. The first idea is that of a software parallelization assistant. The second ideas proposes a notion of computational frameworks. We ship the C++ library with the prototype implementation. The frameworks have been used to rewrite the old legacy C Olden benchmarks to a higher abstraction levels and achieve some parallel speedups.
+\subsection{Software Parallelization Assistant}
 
-\section{Computational Frameworks}
-\quad In this work we propose an idea of computational frameworks. 
+\subsection{Computational Frameworks}
+\quad In this work we propose an idea of computational frameworks. As algorithms and data structures are often inseparable we blend the two into the notion of a computational framework.  
 
 
