@@ -18,9 +18,25 @@ As section \ref{parallel_computing_importance} says, the parallelism in hardware
 \subsection{Manual Parallelization Difficulties}
 \quad Software parallelization has characteristically been a very manual process. As any software development process it consists of a number of stages and parts. The major problems are described below.
 \begin{description}
-\item[Problem understanding and partitioning] As the best software engineering practice dictates, before diving into software development one needs to thoroughly understand the problem to be solved. One needs to decide on the requirements and restrictions the final piece of software must meet. The whole algorithm and software architecture might change with the decision of developing a parallel software version instead of a serial one. If one starts from an already implemented serial software version, the parallelization might be even more difficult to do. Source code comprehension is a hard task. The algorithm chosen for a serial version might be completely unsuitable for a parallel implementation.
-\item[Communications and synchronization]
-\item[Implementation and data dependencies]
+\item[Problem understanding and partitioning] As the best software engineering practices dictate, before diving into software development one needs to thoroughly understand the problem to be solved and decide on the requirements and restrictions the final piece of software must meet. The whole algorithm and software architecture might change with the decision of developing a parallel software version instead of a serial one. If one starts from an already implemented serial software version, the parallelization might be even more difficult to do. Source code comprehension is a hard task. The algorithm chosen for a serial version might be completely unsuitable for a parallel implementation. The problem must be partitioned into relatively independent chunks of work to be processed in parallel. The partitioning can be done in numerous ways and a programmer needs to choose the way to do that (data set decomposition, functional decomposition or a hybrid of the two).
+\item[Communications and synchronization] Very often the parts of the problem to solve are not completely independent and require an exchange of information. Designing the way that exchange is going to work is a complex task. Almost always communication results into an overhead. Sending the data over congested network or waiting on a synchronization barrier all that slows the program down. The slowdown might even diminish all performance benefits obtained from parallelization.
+\item[Implementation and data dependencies] When problem partitioning is done, all communication and synchronization points are determined and the high level parallel algorithm is designed a programmer might start the actual implementation. Here a programmer will run into other types of problems. Consider two functionally equivalent code samples below.\newline\null
+\begin{minipage}[t]{0.50\linewidth}
+\begin{lstlisting}[caption={Non-parallelisable loop with a planted loop-carried data dependence.},label={lst:code_sample_data_dependence},language=C]
+for (int i=1; i<n; i++) {
+  a[i]=a[i-1]+1;
+}
+\end{lstlisting}
+\end{minipage}
+\begin{minipage}[t]{0.50\linewidth}
+\begin{lstlisting}[caption={Parallelisable loop free of any data dependencies.}, label={lst:code_sample_no_data_dependence},language=C]
+for (int i=0; i<n; i++) {
+  a[i]=a[0]+i;
+}
+\end{lstlisting}
+\end{minipage}
+
+The actual shape of the code can break parallelization by introducing fake (not required by the algorithm) dependencies.
 \item[Performance analysis and tuning] One needs to know where the program's hotspots are. Hotspots are the places where the most of the real work is being done. The majority of programs spend most of the CPU time in a few places. The task of a programmer is to find those places and concentrate all parallelization and optimization efforts right there. Finding hotspots might be difficult before the programmer has the whole program implemented. Modern hardware architectures have a multi level memory hierarchy, memory data prefetchers, TLBs, out-of-order execution, etc. It might be surprising how the actual program execution performance differs from the one inferred from the algorithm. Profilers and other analysis tools can be of help here.
 \end{description}
 \quad Finally, all the above challenges are interrelated and very often depend on each other. Parallel software development process can go iteratively with numerous dead ends and redesign efforts. With a long research history into the topic, all these problems are still actual now.
