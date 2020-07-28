@@ -1,34 +1,23 @@
 \chapter{Software Parallelization Assistant}
 
-\section{Abstract}
-Despite decades of research into parallelizing compiler technology, software parallelization remains a largely manual task where the key resource is expert time. In this paper we focus on the time-consuming task of identifying those loops in a program, which are both worthwhile and feasible to parallelize. We present a methodology and tool which make better use of expert time by guiding their effort directly towards those loops, where the largest performance gains can be expected while keeping analysis and transformation effort at a minimum.
-  
-We have developed a novel parallelization assistant that provides programmers with a ranking of all loops in a program based on their overall merit. For each loop this metric combines its potential contribution to speedup and an estimated probability for its successful parallelization. This probability is predicted using a machine learning model, which has been trained, validated, and tested on 1415 labelled loops, achieving a prediction accuracy greater than 90\%.
-  
-We have evaluated our parallelization assistant against sequential C applications from the SNU NAS benchmark suite. We show that our novel methodology achieves parallel performance levels comparable to those from expert programmers while requiring less expert time. On average, our assistant reduces the number of lines of code that have to be inspected manually before reaching expert-level parallel speedup by 20\%.
-
 \section{Introduction}
 
 % problem: the need for manual parallelisation, auto-parallelisation does not deliver desired performance improvements
 
-Parallel hardware is ubiquitous through the entire spectrum of computing
-systems, from low-end embedded devices to high-end supercomputers.
+\quad Parallel hardware is ubiquitous through the entire spectrum of computing systems, from low-end embedded devices to high-end supercomputers.
 %
 Yet, most of the existing software is written in a sequential fashion.
 %
 Despite decades of intensive research in automatic software
 parallelization~\cite{6813266}, fully exploiting the potential of modern multi- and many-core hardware still requires a significant manual effort.
 %
-Given the difficulty of the obstacles faced by automatic parallelization today,
-we do not expect that programmers will be liberated from performing manual
-parallelization in the near future~\cite{Larsen:2012:PML:2410141.2410600}.
+Given the difficulty of the obstacles faced by automatic parallelization today, we do not expect that programmers will be liberated from performing manual parallelization in the near future~\cite{Larsen:2012:PML:2410141.2410600}.
 
 % solution: parallelisation assistant
 
-This paper introduces a novel parallelization assistant that aids a programmer in the process of parallelizing a program in the frequent case where automatic approaches fail to do so.
+This chapter introduces a novel parallelization assistant that aids a programmer in the process of parallelizing a program in the frequent case where automatic approaches fail to do so.
 %
-The assistant reduces the manual effort in this process by presenting a
-programmer with a ranking of program loops that are most likely to 1) require little or no effort for successful parallelization and 2) improve the program's performance when parallelized.
+The assistant reduces the manual effort in this process by presenting a programmer with a ranking of program loops that are most likely to 1) require little or no effort for successful parallelization and 2) improve the program's performance when parallelized.
 %
 Thus, it improves over the traditional, profile-guided process by also taking into account the \emph{probability} of potential parallelization for each of the profiled loops.
 
@@ -36,12 +25,9 @@ Thus, it improves over the traditional, profile-guided process by also taking in
 
 At the core of our parallelization assistant resides a novel machine-learning (ML) model of loop parallelizability.
 %
-Loops are compelling candidates for parallelization, as they are naturally
-decomposable and tend to capture most of the execution time in a program.
+Loops are compelling candidates for parallelization, as they are naturally decomposable and tend to capture most of the execution time in a program.
 %
-Furthermore, focusing on loops allows the model to leverage a large amount of
-specific analyses available in modern compilers, such as generalized iterator
-recognition~\cite{Manilov:2018:GPI:3178372.3179511} and loop dependence analysis~\cite{Jensen:2017:ILD:3132652.3095754}.
+Furthermore, focusing on loops allows the model to leverage a large amount of specific analyses available in modern compilers, such as generalized iterator recognition~\cite{Manilov:2018:GPI:3178372.3179511} and loop dependence analysis~\cite{Jensen:2017:ILD:3132652.3095754}.
 %
 The model encodes the results of these analyses together with basic properties of the loops as machine learning \textit{features}.
 
@@ -70,8 +56,7 @@ The parallelization assistant combines inference on the parallelizability model
 with traditional profiling to rank higher those loops with a high probability of being parallelizable and impacting the program performance.
 %
 An evaluation on eight programs from the SNU NPB suite shows that
-the program performance tends to improve faster as loops are parallelized in
-the ranking order suggested by our parallelization assistant compared to a traditional order based on profiling only.
+the program performance tends to improve faster as loops are parallelized in the ranking order suggested by our parallelization assistant compared to a traditional order based on profiling only.
 %
 On average, following the order suggested by the assistant reduces by approximately 20\% the number of lines of code a programmer has to examine manually to parallelize SNU NPB to its expert-level speedup.
 %

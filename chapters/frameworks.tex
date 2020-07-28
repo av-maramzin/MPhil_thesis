@@ -1,12 +1,45 @@
 \chapter{Computational Frameworks}
 
 \section{Introduction}
-\quad For many decades there has been an ongoing trend in the process of software engineering to move up in the levels of abstraction from a bare hardware to a higher level concepts closer to a human reasoning and understanding. There have been several breaking points. A move from assembly languages to languages like Fortran and C increased the productivity of programmers by supporting structuredness and modularity and offloading many routine and tedious tasks onto a compilation software. C and Fortran were high-level languages of that time, but still a low-level languages for today's standards. These languages support an imperative programming paradigm. The main characteristic of that is the concept of state. The statements of the language read and update the state. Procedures pass the state and results around achieving the final goal of the program.   
+
+% problem: manual parallelization is hard, a need for a more user friendly higher level construct
+
+\quad The task of manual software parallelization is multifaceted. 
+
+To fully exploit the potential of modern multi- and many-core hardware still requires a significant manual effort.
+
+% solution: computational frameworks library
+
+\quad The programmer starts on the high level of problem domain and algorithm. The task is to find independent parts in the problem to be solved in parallel. If there are dependencies among them, then the programmer has to design a synchronization mechanism. In our solution package we propose an off-the-shelf C++ template library of computational frameworks. The latter are ready to use parallelism patterns. A programmer only needs to customize his computation through an LLVM-like interface.
+
+This chapter introduces a novel parallelization assistant that aids a programmer in the process of parallelizing a program in the frequent case where automatic approaches fail to do so.
+%
+The assistant reduces the manual effort in this process by presenting a programmer with a ranking of program loops that are most likely to 1) require little or no effort for successful parallelization and 2) improve the program's performance when parallelized.
+%
+Thus, it improves over the traditional, profile-guided process by also taking into account the \emph{probability} of potential parallelization for each of the profiled loops.
+
+% how?
+
+A parallelization hidden behind an LLVM-like interface of functional algorithmic patterns. 
+%
+Functional programming constructs (fold, map, reduce, etc.) are quite common, parallelizable, well-known and are good candidates for parallelization.
+
+We applied the library to a set of Olden benchmarks.
+
+%
+Given the high level of effort involved in manual parallelization, such a reduction can translate into substantial development cost savings.
+
+% The trend of moving to a higher abstraction levels in software engineering
+
+\quad For decades there has been an ongoing trend in the process of software engineering to move up in the levels of abstraction from a bare hardware to a higher level concepts closer to a human reasoning and understanding.\newline\null
+\quad A move from assembly languages to languages like Fortran and C increased productivity of programmers by supporting structuredness and modularity and offloading many routine and tedious tasks onto a compilation software. The development of object-oriented languages neared the process of software design to a human level object based construction. All these languages are based on imperative programming principles, which revolve around the notion of the state. Language statements leave side effects and updates to the state. The latter is passed around in order to achieve the final goal. A more recent trend though is a move from imperative programming paradigm to a functional. Functional languages specify the final requirement to be computed, but do not specify the exact sequence of statements   
+
+
+C and Fortran were high-level languages of that time, but still a low-level languages for today's standards. These languages support an imperative programming paradigm. The main characteristic of that is the concept of state. The statements of the language read and update the state. Procedures pass the state and results around achieving the final goal of the program.   
 
 \quad The trend of moving from low to higher abstraction levels is not only true for software engineering in general, but for parallel software engineering in particular. Modern hardware provides a diverse and vast support for different forms of parallelism: pipelined CPUs with out-of-order and superscalar instruction execution, vector extensions of modern CPU instruction sets, multi-core processors running as part of multi-processor system, etc. Given a sequential program a programmer can work at the finest level of granularity by choosing vector instructions over scalar ones and changing their relative order trying to minimise the number of pipeline stalls and memory waits. To exploit a coarse-grain parallelism a programmer can rewrite a program in a multi-threaded fashion. Here a programmer may choose to work with the operating system interface like POSIX threads or use some 
 
 abstract parallel machine models   
-
 
 level by rewriting program instructions by preferring vector ones to a scalar or change their relative order trying to minimise the number of pipeline stalls    
 
@@ -14,18 +47,18 @@ in modern computing systems a programmer may
 
 sequential program a programmer can work with its instructions directly by 
 
+\quad In this chapter we propose an idea of \textbf{computational frameworks}. Computational frameworks are a higher level entities, which embody the principles of both imperative and functional programming styles. Computational frameworks make certain programming tasks easier to address. These tasks can be outlined by the properties 
+
 \subsection{Motivating example}
-\quad Let's consider a motivating example highlighting the essence of the idea of computational frameworks. Suppose we want to calculate a left fold updating its elements with corresponding folded values. We can code that simple computation using Standard Template Library (STL) list class. Listing \ref{lst:left_fold_list} shows the code. The task is small and the code is concise, but it is still possible to see its drawbacks. There isn't a clear separation of concerns here. List traversal, result computation and list elements transformation are all mixed up together. For a better structuredness it would make sense to put these different pieces of functionality into separate places. Alternatively, we could use std::accumulate() function template. The latter provides a programmer with a more concise interface, but does not allow any side effects. We would still need to write a separate chunk of code aimed at an update of list elements.\newline 
+\quad Let's consider a motivating example highlighting the essence of the idea of computational frameworks. Suppose we want to calculate a \textit{left fold} updating its elements with corresponding folded values.\newline\null
+\quad We can code that simple computation using C++ Standard Template Library (STL). Listing \ref{lst:left_fold_list} shows the code implementing the task with a list class template. First, we construct a list with 5 elements and initialize them. Then we loop through the list updating its elements and return the final left folded value. The task is small and the code is concise, but it is still possible to see its drawbacks. The code does not clearly separate concerns: list traversal, result computation and transformation of list elements are all mixed up together. For a better structuredness it would make sense to put these different pieces of functionality into separate places. Alternatively, we could use STL's std::accumulate() function template. The latter provides a programmer with a more concise and abstract interface, but does not allow any side effects. We would still need to write a separate chunk of code aimed at an update of list elements.\newline\null 
 \quad In our project we propose an idea of computational frameworks. Listing \ref{lst:left_fold_framework} shows an alternative implementation of left fold using our Fold computational framework. In order to use it a programmer has to be familiar with the concept of functional fold. The underlying implementation of the fold logic is a list traversal, which forms the backbone of the computation and is hidden behind the user interface our framework provides. 
 
 The Fold uses standard C++ language facilities such as static and dynamic polymorphism and leans onto the compiler to do the major work. The user interafce resembles LLVM Pass Framework. A programmer has to use a curiously recurring template pattern.
 
 \quad Although the code in listing \ref{lst:left_fold_framework} feels heavy for such a simple computation and is certainly an overkill, but when a computational task is 
 
-
-
-
-\begin{minipage}[t]{\linewidth}
+%\begin{minipage}[t]{\linewidth}
 \begin{lstlisting}[caption={Left fold computation using standard STL list class template},label={lst:left_fold_list},language=C++]
 #include <list>
 using namespace std;
@@ -45,10 +78,10 @@ int main() {
     return 0;
 }
 \end{lstlisting}
-\end{minipage}
+%\end{minipage}
 
 
-\begin{minipage}[t]{\linewidth}
+%\begin{minipage}[t]{\linewidth}
 \begin{lstlisting}[caption={Left fold computation using our Fold computational framework},label={lst:left_fold_framework},language=C++]
 #include "Fold.h"
 using namespace abstract;
@@ -80,7 +113,17 @@ int main() {
     return 0;
 }
 \end{lstlisting}
-\end{minipage}
+%\end{minipage}
+
+\subsection{Contributions}
+\quad In summary, the project of computational frameworks makes the following contributions:
+%
+\begin{itemize}
+\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemii{$\bullet$}
+\item We propose an idea of computational frameworks as a higher level construct blending algorithms and data structures and representing both functional and imperative programming paradigms.
+\item We develop a prototype C++ class template library and rewrite Olden benchmarks using that library. The latter leads to a more structured, modern and parallel benchmark implementation resulting into performance improvement of X\% relative to the original legacy C sequential version.   
+\end{itemize}
 
 \section{Computational Frameworks}
 \quad In this work we propose an idea of \textbf{computational frameworks} and we show its utility and use on a subset of Olden benchmarks. The idea grows on a wide review of the available parallel software development methodologies as well as on the understanding of problems in the task of software parallelization.  
