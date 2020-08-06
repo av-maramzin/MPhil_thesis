@@ -137,7 +137,41 @@ for (p=list; p!=NULL; p=p->next) {
 \quad The work of Dekker \cite{Dekker:1994:ADS:3107859.3107876} addresses software design recovery problem in a completely different way. Contrary to the approaches described above, which operate on the IR and dynamic instruction stream levels, work of Dekker operates at the level of abstract syntax tree. Dekker's tool tries to compact the tree down to a recognizable syntactic patterns by transforming it in accordance to a special grammar.
 
 
+\section{Imperative and Functional programming}
+\label{background_programming_paradigms}
+\quad Programming languages can be classified by different \textit{programming paradigms} they support. Among the most general classifications are \textit{imperative} and \textit{declarative} programming languages.\newline\null
+\quad Imperative programs are written in a form of instruction sequences, which read and write the \textit{state} of a program. The concept of state is the main characteristic of imperative programming paradigm. Instruction sequences can be structured in various ways. In \textit{procedural} programming paradigm instructions are grouped inside procedures and functions. In \textit{object-oriented} programming (OOP) paradigm instructions are grouped with the data they operate on inside objects of various types or classes. Programs are either out of various procedures calling each other and exchanging the data or on the interaction of objects of various types.\newline\null
+\quad Declarative programs do not specify the exact sequence of steps and state updates a program needs to do in order to get the desired result. Declarative programs declare the properties of the desired result. The properties can be specified as a set of constraints like in \textit{constraint} programming or a set of linear inequalities like in \textit{linear} programming. \textit{Functional} programming is another subtype of declarative programming. In functional programming the final result is specified as a sequence of stateless function evaluations, which form a tree of expressions. Among the most common constituents are functions like \textit{map}, \textit{reduce}, \textit{fold}, etc. Functions can be passed as arguments and returned from other functions ultimately composing bigger programs.\newline\null
+\quad Functional programming is sometimes treated as synonymous with purely functional programming, a subset of functional programming which treats all functions as deterministic mathematical functions, or pure functions. When a pure function is called with some given arguments, it will always return the same result, and cannot be affected by any mutable state or other side effects. This is in contrast with impure procedures, common in imperative programming, which can have side effects (such as modifying the program's state or taking input from a user). Proponents of purely functional programming claim that by restricting side effects, programs can have fewer bugs, be easier to debug and test, and be more suited to formal verification.\newline\null
+\quad There are no universally optimal programming paradigms and languages. Some languages are more convenient and suitable for one sort of problems, some languages are better at tackling other problems. For example, functional languages are more convenient in addressing certain domains such as R for statistics and financial analysis. Imperative languages are certainly better for simulations and other state based scientific computations. For that reason, major languages are often multi-paradigm to cover a potentially larger set of problems. Largely imperative C++ language included support for functional programming with its newer standards starting from C++11.\newline\null
+\quad Although, there is still the gap. Some problems contain computations, which are better expressed with standard functional concepts, but at the same time require some state keeping. These problems lie at the boundary of functional and imperative programming. Both paradigms are equally important. In the chapter \ref{computational_frameworks} we propose an idea of \textit{computational frameworks}, which fills that gap. 
+
 \section{OOP and Software Design Patterns}
+\label{background_oop_design_patterns}
+\quad Object-oriented programming (OOP) is arguably the most widely used programming paradigm nowadays. At the very essence, in OOP computer programs are designed by making them out of objects that interact with one another. Object interactions are very close to a human level reasoning and logic.\newline\null
+\quad Objects are instances of different types or classes in OOP terminology. Some classes relate to each other (like a car and a truck), some are independent (a cat and a table). Usually relations form hierarchies and languages provide support for class derivation and inheritance.        
+
+\quad \textit{Encapsulation} is another OOP technique, that is used for protection against object misuse and unintended outside interference. Data and methods of a class concerned with its internal workings are declared \textit{private} to a class, while those designed to form an outward appearance and interface of a class are declared \textit{public}. This facilitates code refactoring, for example allowing the author of the class to change how objects of that class represent their data internally without changing any external code. It also eases a program comprehension and debugging by better localizing functionality and thus possible bugs.
+
+\quad \textit{Dynamic dispatch} is the responsibility of the object, not any external code, to select the procedural code to execute in response to a method call, typically by looking up the method at run time in a table associated with the object. This OOP feature allows a programmer to write a more general code, which works with abstract interface methods and leave the exact method resolution to be made during the running time of a program.
+
+\quad The technique of a dynamic dispatch is closely related to the technique of \textit{inheritance}. Inheritance allows classes to be arranged in a hierarchy that represents "is-a-type-of" relationships. Inheritance can be of two types: interface inheritance and implementation inheritance. The first one allows a parent class to require its descendants to stick to the same interface. A common interface allows the objects of different classes from the same hierarchy to be operated on by the same type agnostic code. The latter is called a \textit{polymorphism}. The user code can be more concise and abstract. The call of the same method on the parent class or one of its descendants can result into a varying behaviour.     
+
+\quad The presence of all the above features makes OOP languages extremely rich with various facilities. That creates a vast design space for software architects and engineers and spawns the whole topic of software design patterns.    
+
+\quad At the end it is the experience, mastery and ingenuity of a programmer which determine the final software design.  
+
+\quad Our computational frameworks use all the above concepts and principles and are based on modern and convenient software design patterns. 
+
+
+
+
+
+
+
+
+
+
 \quad Object-oriented software design is a complex topic in itself, which spawns a number of problems and questions. 
 
 \quad Software design patterns are reusable solutions to common design problems in object-oriented software engineering. They live at the level higher than that of a source code and are language agnostic. The solutions can be regarded as standard solutions to design problems they target. These solutions have been well tested and proven to be the most reliable and elegant.
@@ -145,13 +179,6 @@ for (p=list; p!=NULL; p=p->next) {
 Chain of responsibility pattern is very similar to fold.
 Visitor pattern roughly corresponds to fold.
 
-\section{Imperative and Functional programming}
-\quad Programming languages can be classified by different \textit{programming paradigms} they support. Among the most general classifications are imperative and declarative programming languages.\newline\null
-\quad Imperative programs are written in a form of instruction sequences, which read and write the \textit{state} of a program. The concept of state is the main characteristic of imperative programming paradigm. Instruction sequences can be structured in various ways. In procedural programming paradigm instructions are grouped inside procedures and functions. In object-oriented programming (OOP) paradigm instructions are grouped with the data they operate on inside objects of various types or classes.\newline\null
-\quad Declarative programs do not specify the exact sequence of steps and state updates a program needs to do in order to get the desired result. Declarative programs declare the properties of the desired result. The properties can be specified as a set of constraints like in constraint programming or a set of linear inequalities like in linear programming. Functional programming is another subtype of declarative programming. In functional programming the final result is specified as a sequence of stateless function evaluations, which form a tree of expressions. Among the most common constituents are functions like \textit{map}, \textit{reduce}, \textit{fold}, etc. Functions can be passed as arguments and returned from other functions ultimately composing bigger programs.\newline\null
-\quad Functional programming is sometimes treated as synonymous with purely functional programming, a subset of functional programming which treats all functions as deterministic mathematical functions, or pure functions. When a pure function is called with some given arguments, it will always return the same result, and cannot be affected by any mutable state or other side effects. This is in contrast with impure procedures, common in imperative programming, which can have side effects (such as modifying the program's state or taking input from a user). Proponents of purely functional programming claim that by restricting side effects, programs can have fewer bugs, be easier to debug and test, and be more suited to formal verification.\newline\null
-\quad There are no universally optimal programming paradigms and languages. Some domains and problems are better addressed with certain languages, some are with others. For example, functional languages are more convenient in addressing certain domains such as R for statistics and financial analysis. Imperative languages are certainly better for simulations and other state based scientific computations. Largely imperative C++ language included support for functional programming with its newer standards starting from C++11.\newline\null
-\quad Although, there is still the gap. Computational frameworks fill the gap between functional and imperative. Some problems are better expressed with the help of well established functional constructs, but still rely on the state.
 
 \section{Parallel Algorithmic Skeletons}
 

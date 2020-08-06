@@ -1,7 +1,8 @@
 \chapter{Computational Frameworks}
+\label{computational_frameworks}
 
 \section{Introduction}
-
+\label{computational_frameworks_introduction}
 % problem: manual parallelization is hard, a need for a more user friendly higher level construct
 
 \quad The task of manual software parallelization is multifaceted. 
@@ -50,6 +51,7 @@ sequential program a programmer can work with its instructions directly by
 \quad In this chapter we propose an idea of \textbf{computational frameworks}. Computational frameworks are a higher level entities, which embody the principles of both imperative and functional programming styles. Computational frameworks make certain programming tasks easier to address. These tasks can be outlined by the properties 
 
 \subsection{Motivating example}
+\label{computational_frameworks_motiva}
 \quad Let's consider a motivating example highlighting the essence of the idea of computational frameworks. Suppose we want to calculate a \textit{left fold} updating its elements with corresponding folded values.\newline\null
 \quad We can code that simple computation using C++ Standard Template Library (STL). Listing \ref{lst:left_fold_list} shows the code implementing the task with a list class template. First, we construct a list with 5 elements and initialize them. Then we loop through the list updating its elements and return the final left folded value. The task is small and the code is concise, but it is still possible to see its drawbacks. The code does not clearly separate concerns: list traversal, result computation and transformation of list elements are all mixed up together. For a better structuredness it would make sense to put these different pieces of functionality into separate places. Alternatively, we could use STL's std::accumulate() function template. The latter provides a programmer with a more concise and abstract interface, but does not allow any side effects. We would still need to write a separate chunk of code aimed at an update of list elements.\newline\null 
 \quad In our project we propose an idea of computational frameworks. Listing \ref{lst:left_fold_framework} shows an alternative implementation of left fold using our Fold computational framework. In order to use it a programmer has to be familiar with the concept of functional fold. The underlying implementation of the fold logic is a list traversal, which forms the backbone of the computation and is hidden behind the user interface our framework provides. 
@@ -116,6 +118,7 @@ int main() {
 %\end{minipage}
 
 \subsection{Contributions}
+\label{computational_frameworks_contributions}
 \quad In summary, the project of computational frameworks makes the following contributions:
 %
 \begin{itemize}
@@ -126,9 +129,11 @@ int main() {
 \end{itemize}
 
 \section{Computational Frameworks}
+\label{computational_frameworks_main}
 \quad In this work we propose an idea of \textbf{computational frameworks} and we show its utility and use on a subset of Olden benchmarks. The idea grows on a wide review of the available parallel software development methodologies as well as on the understanding of problems in the task of software parallelization.  
 
 \subsection{Overview}
+\label{computational_frameworks_overview}
 \quad In our project we propose a C++ library of computational frameworks. Computational frameworks are a blend of imperative, object-oriented and functional programming paradigms. They lift algorithm implementation in the C++ language to a higher level.
 Computational frameworks are a blend of algorithms and data structures as well as several programming paradigms such as imperative, object-oriented and functional programming. They lift C++ program implementations to a higher conceptual level. 
 
@@ -137,6 +142,7 @@ User-exposed methods of classes are higher-order functions and can take custom f
 \quad Improves structuredness, modularity, separation of concerns and hides possible program parallelization behind the convenient user API.  
 
 \subsection{Fractal}
+\label{computational_frameworks_fractal}
 \quad The \textbf{Fractal} computational framework has been inspired by the theoretical work on tree reductions [] and 3 Olden benchmarks (health, treeadd, perimeter). Figure \ref{fig:fractal} illustrates the Fractal functionality.\newline\null
 \quad There are numerous data structures, computational patterns, processes and examples, which can be characterized as being fractals.\newline\null
 \quad The simplest example of fractal is an n-ary tree. Imagine we store some data at every node of the tree and want to accumulate it starting from the leaves at the very bottom and going all the way up to the root of the tree. Accumulation procedure processes every node by taking the result from all its children, making a computation and passing the result up to the parent element. The procedure may have some side-effects on the nodes and keeps the whole tree data structure along with its state in memory. In that sense it is not a stateless functional programming. At the same time the accumulation procedure can be passed as an argument to a higher-order compute function. The movement of data through the nodes of the tree from their children to their parents is the fixed and immutable part of an algorithm, whereas the accumulation procedure can be given as a parameter. The latter separates the algorithm into a well-structured user and library parts. The library part acts as a backbone and the user part grows on it. The computations described above lie at the basis of health and treeadd benchmarks.\newline\null
@@ -148,6 +154,7 @@ User-exposed methods of classes are higher-order functions and can take custom f
 \quad A more complicated and interesting fractal example would be a square being continuously and recursively divided into 4 equal sub-squares (southwest, northwest, southeast and northeast). The deep-growing structure is actually a 4-ary tree as well. Imagine one wants to compute the perimeter of some figure. One way to do it would be to map the figure on the square plane and then turn the plane into a grid by continuously splitting the square into 4 equal sub-parts (southwest, northwest, southeast, northeast) till we reach the granularity size of the grid. Then we paint all the grid elements located inside the figure shape as black and those outside of it as white. We iterate over the grid and detect all points of color flips and add the size of the grid elements to the final sum, which at the end is going to approximate the perimeter of the figure. That is roughly what the perimeter benchmark does.\newline\null
 \quad In all its generality the fractal is a pattern, which can be characterized with self-similarity, repeatedness, structuredness, inherent parallelizability and the exact numeric values such as its depth and arity. All that naturally maps onto the C++ implementation as a class template we describe below.
 \subsection{Fold}
+\label{computational_frameworks_fold}
 \quad The Fold computational framework has been inspired by the computation done in the power benchmark. The fold is not a new concept and has found a wide application in many functional languages. The C++ language provides std::accumulate() function template as a component of its Standard Template Library, which performs a functional fold over a given data structure, but contrary to our computational framework does not allow any side-effects and modifications to the elements of the data structure. Moreover, our C++ class template library provides an alternative interface to a user with an extensible customization space.\newline\null
 \begin{figure}[ht]
 \includegraphics[width=1.0\textwidth]{images/Fold.pdf}
@@ -158,10 +165,12 @@ User-exposed methods of classes are higher-order functions and can take custom f
 
 
 \subsection{Reduce}
+\label{computational_frameworks_reduce}
 \quad The Reduce computational framework is a well-known one. The difference between our computational framework and std::reduce() from C++ Standard Template Library (STL) is the possibility of having side effects and an alternative user customization interface. Our computational framework takes a function object with two overloaded and overridden virtual operator() methods. One specifies how to reduce the value from a single element (possibly changing the element in the process) and the other one defines the way of combining all the reduced values into the final return value. Our framework implements sequential as well as parallel Reduce versions.  
 
 
 \subsection{Frameworks Library Design and Implementation}
+\label{computational_frameworks_library_design}
 \quad The design and implementation of computational frameworks library have been done iteratively using 4 Olden benchmarks as inspiration and  
 The design of the C++ computational frameworks library aims at several goals.  
 \begin{description}
@@ -212,6 +221,7 @@ class Framework {
 \quad There were several questions raised in the design process of a template library. 
 
 \section{Performance of the library}
+\label{computational_frameworks_performance}
 \quad We have rewritten old legacy C implementations of 4 Olden benchmarks: health, perimeter, treeadd and power. The table below shows the performance gains our versions have over old sequential implementations.   
 
 
