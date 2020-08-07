@@ -1,22 +1,24 @@
 \chapter{Background}
-
-\quad Parallel computing and software parallelization are the vast overlapping and complementary computer science areas with a history dating back to 1950s. With the advances in semiconductor industry the topics have left from high-end scientific supercomputers niche and spread to a much wider area spanning to all consumer electronic devices and are of major importance now. The parallelism is pervasive and all. Every computer scientist, software developer would benefit from having an insight into the area. Nonetheless the topics are extremely difficult and require a great deal of knowledge in various subtopics. Not all 
+\label{background}
+\quad \textit{Parallel computing} and \textit{software parallelization} are vast, overlapping and complementary computer science areas with a history dating back to 1950s. With the advances in semiconductor industry the topics have left the niche of high-end scientific supercomputers and spread to a much wider area spanning across all consumer electronic devices and have become the topics of the major importance.\newline\null
+\quad Nowadays the parallelism is pervasive. Parallel hardware is omnipresent across the whole wide spectrum of computing systems. In order to exploit all the hardware capabilities the software has to be parallel as well. And thus, every computer scientist and software developer would benefit from having an insight into the area. Nonetheless, the topics are extremely difficult, require a serious time investment and a great deal of knowledge in various subdomains. It is not always practical to expect from an average programmer to possess such a deep expertise. For that reason we propose a solution aimed at alleviating the challenging task of manual software parallelization. Our solution consists of two components. We describe them in chapters \ref{assistant} and \ref{computational_frameworks}.\newline\null
+\quad In this chapter we accumulate the material, which lays the ground for descriptions of our proposed solutions in chapters \ref{assistant} and \ref{computational_frameworks}. We relied on parallel computing tutorials from Lawrence Livermore National Laboratory (LLNL) \cite{llnl_computing} to prepare the material. Section \ref{parallel_computing_importance} stresses the importance of parallel computing and software parallelization. Section [] presents the challenges of manual and then automatic software parallelization. These challenges form the ground for our assistant solution to grow on. Then, in section [] we discuss the problem of data structure choice and how it affects software parallelization. We present a thorough literature review on the topic of Data Centric Parallelization (DCP) dealing with the task of automatic data structure recognition. Our review concludes that automatic techniques are still an unsolved grand challenge. Data structures are often inseparable with algorithms the former support. Our computational frameworks we propose in chapter \ref{computational_frameworks} grow on the inseparability fact and are a blend of data structures and algorithms. Furthermore, the modern software design and engineering tasks are extreamly rich and complex topics. In sections [] and [] we talk about imperative, functional and object-oriented programming paradigms, as well as various OOP software design patterns. Our computational frameworks take the best principles and alleviate the task of software architecture design for an average programmer.        
 
 \section{The importance of parallel computing}
-\label{parallel_computing_importance}
-\quad The parallelism is pervasive and the future of computing is parallel. There are numerous factors which stress the importance of parallelism in modern computing.   
-
+\label{background_parallel_computing_importance}
+\quad The parallelism is pervasive and the future of computing is parallel. There are numerous factors which stress the importance of parallelism in modern computing.
 \begin{description}
 \item[Abundance of natural parallelism] The field of High Performance Computing (HPC) has traditionally been concerned with scientific modelling and simulation of various natural phenomena (climate change, fluid flows, etc.). Such systems consist of numerous often independent parts. When we compile a highly parallel algorithm to a serial sequence of CPU instructions or process a huge data set with independent parts sequentially we are artificially constraining a vastly parallel computation to a serial one. Parallelism is not limited to a natural world, instead many algorithms have inherent parallelism in them.
 \item[Semiconductor technology advances and power limits] With advances in transistor density it became possible to design more complicated CPUs. Initially the trend went into deeper pipelines, but running into power limits the industry design shifted towards multi core CPUs and multiprocessor systems. Such systems require of software to mirror the trend and become parallel.
 \item[Domain inherent parallelism and specialized computations] The areas like computer graphics for instance have a lot of problems that can be processed in a Single Instruction Multiple Data (SIMD) fashion. That naturally led to specialized co-processors like GPUs. The hardware systems grow complex and heterogeneous.
 \end{description}
 
-
 \section{Challenges in Software Parallelization}
-As section \ref{parallel_computing_importance} says, the parallelism in hardware has become pervasive. To achieve the full performance potential of modern hardware the software has to be mapped onto that parallel hardware. The process of software parallelization has characteristically been a very manual task, which is complex, time-consuming and error-prone.     
+\label{background_challenges}
+\quad The problem of software parallelization is extremely complex and multi-faceted. There are various approaches to the problem, but all of them have their pros and cons. Although, the process of software parallelization has characteristically been a very manual task, which is time-consuming and error-prone, there are also automatic and machine learning based approaches to the problem. In this section we highlight inherent challenges of these approaches. The solution we propose aims to address these challenges. 
 
 \subsection{Manual Parallelization Difficulties}
+\label{background_challenges_manual}
 \quad Software parallelization has characteristically been a very manual process. As any software development process it consists of a number of stages and parts. The major problems are described below.
 \begin{description}
 \item[Problem understanding and partitioning] As the best software engineering practices dictate, before diving into software development one needs to thoroughly understand the problem to be solved and decide on the requirements and restrictions the final piece of software must meet. The whole algorithm and software architecture might change with the decision of developing a parallel software version instead of a serial one. If one starts from an already implemented serial software version, the parallelization might be even more difficult to do. Source code comprehension is a hard task. The algorithm chosen for a serial version might be completely unsuitable for a parallel implementation. The problem must be partitioned into relatively independent chunks of work to be processed in parallel. The partitioning can be done in numerous ways and a programmer needs to choose the way to do that (data set decomposition, functional decomposition or a hybrid of the two).
@@ -42,6 +44,7 @@ The actual shape of the code can break parallelization by introducing fake (not 
 \end{description}
 \quad Finally, all the above challenges are interrelated and very often depend on each other. Parallel software development process can go iteratively with numerous dead ends and redesign efforts. With a long research history into the topic, all these problems are still actual now.
 \subsection{Limitations of Automatic Techniques}
+\label{background_challenges_automatic}
 \quad There are various tools available to assist a programmer in the task of software parallelization. Parallelizing compilers are the most widely used.
 
 Fully Automatic
@@ -75,7 +78,10 @@ We measured the running time of NASA Parallel Benchmarks after being compiled wi
 \end{figure}
 
 \subsection{Limits of Machine Learning based methods}
+\label{background_challenges_ml}
+
 \subsection{Data-Centric problem}
+\label{background_challenges_dcp}
 \quad As it has already been stated the problem of software parallelisation is multifaceted. There is a vast range of lower level technical issues, which can turn a perfectly parallelisable at a higher level computation into a non-parallelisable implementation. In our ML assistant project (see Chapter \ref{chapter_ml_assistant}) we showed that the main reasons of Intel Compiler failures on SNU NPB benchmarks are alias analysis conservativeness, uninlined function calls and statically unresolvable dependencies. The assistant tool we designed targets these aspects of the software parallelisation problem. But, there are many more reasons leading to non-parallelisable algorithm implementations. Source code listings \ref{lst:array} and \ref{lst:list} brightly illustrate yet another unsolved problem.\newline\null
 \begin{minipage}[t]{0.45\linewidth}
 \begin{lstlisting}[caption={Parallelisable loop operating on a \textbf{linear array}.},label={lst:array},language=C]
@@ -106,8 +112,8 @@ To combat the problem industry vendors and major organisation came to design ind
 
 
 \section{Data-Centric Parallelization}
-\label{chapter_dcp}
-\subsubsection{The Problem}
+\label{background_dcp}
+\subsection{The Problem}
 \quad As it has already been stated the problem of software parallelisation is multifaceted. There is a vast range of lower level technical issues, which can turn a perfectly parallelisable at a higher level computation into a non-parallelisable implementation. In our ML assistant project (see Chapter \ref{chapter_ml_assistant}) we showed that the main reasons of Intel Compiler failures on SNU NPB benchmarks are alias analysis conservativeness, uninlined function calls and statically unresolvable dependencies. The assistant tool we designed targets these aspects of the software parallelisation problem. But, there are many more reasons leading to non-parallelisable algorithm implementations. Source code listings \ref{lst:array} and \ref{lst:list} brightly illustrate yet another unsolved problem.\newline\null
 \begin{minipage}[t]{0.45\linewidth}
 \begin{lstlisting}[caption={Parallelisable loop operating on a \textbf{linear array}.},label={lst:array},language=C]
@@ -126,8 +132,8 @@ for (p=list; p!=NULL; p=p->next) {
 \end{minipage}
 \quad Listings \ref{lst:array} and \ref{lst:list} illustrate two alternative implementations of the same simple computation. We increment all sequence elements by one. Listing \ref{lst:array} implements the sequence with a regular array linearly laid out in the memory. Listing \ref{lst:list} chooses a linked list as an implementing data structure, which leads to a source code non-parallelisability.\newline\null
 \quad In the project of "Data-Centric Parallelisation (DCP)" we would like to automatically recognise 
-\subsubsection{Literature Review}
-\label{dcp_literature_review}
+\subsection{Literature Review}
+\label{background_dcp_literature_review}
 \quad The idea of automatic discovery of higher level entities in programs is not a new one. This discovery problem is closely interlinked and entangled with alias analysis techniques \cite{Muchnick:1998:ACD:286076} like points-to analysis \cite{Emami:1994:CIP:178243.178264}. Points-to analysis is a variation on data flow analysis techniques. The final output is the sets of pairs of the form (\textit{p},\textit{x}) (pointer variable \textit{p} points to a stack allocated variable \textit{x}). These techniques are aimed at getting aliasing information regarding stack-allocated pointers.\newline\null
 \quad The problem of understanding heap-directed pointers and heap-allocated linked data structures these pointers might point to is addressed with a family of static analysis techniques collectively known as shape analysis. Shape analysis techniques can be used to verify properties of dynamically allocated data structures in compile time. These are among the oldest and most well known techniques. Three-valued logic \cite{Sagiv:1999:PSA:292540.292552}\cite{Wilhelm:2000:SA:647476.760384} can be used as an example. The technique proposes a construction of a mathematical model consisting of logical predicate expressions. The latter correspond to certain pointer operating imperative language program statements. Abstract interpretation of these statements leads to a construction of sets of shape graphs at various program points. Shape graphs approximate the possible states of heap-allocated linked data structures and answer the questions such as node reachability, data structure disjointness, cyclicity, etc. The major limitation of these simplified mathematical models is the lack of precision high level of abstraction leads to. The problem of precise shape analysis is provably undecidable.\newline\null
 \quad The work of \cite{Ghiya:1996:TDC:237721.237724} proposes a simplified and hence more practical implementation of shape analysis. Authors propose to use direction \textit{D} and interference \textit{I} matrices instead of complex mathematical models in order to derive shape information on heap allocated data structures. The entry of direction matrix \textit{D[p,q]} says if there exists a path from a node referred to by \textit{p} to a node referred to by q. In other words, if we can enter a path withing the data structure through \textit{p} and exit through \textit{q}. The entry of interference matrix \textit{I[p,q]} says if the paths started from \textit{p} and \textit{q} are going to intersect at some point. Authors implement their technique withing McCAT compiler, which uses SIMPLE intermediate representation with a total of 8 statements (\textit{malloc()}, pointer assignments \textit{p=q}, structure updates \textit{p-$>$next=q}), which are capable of changing \textit{D} and \textit{I} matrices. Statements generate and kill entries in matrices. Moreover, they are capable of changing \textit{Shape} attribute of pointers. The technique has been assessed on various benchmarks (bintree, xref, chomp, assembler, loader, sparse, etc.) from the era before the standard benchmark suites became available. The technique mostly reported shapes as \textit{Trees} (be it a binary tree or a linked-list) or sometimes as \textit{DAGs} or \textit{Cycles} but with higher error rates in these last cases. The latter shows that the technique is imprecise and conservative.\newline\null
@@ -148,37 +154,27 @@ for (p=list; p!=NULL; p=p->next) {
 
 \section{OOP and Software Design Patterns}
 \label{background_oop_design_patterns}
-\quad Object-oriented programming (OOP) is arguably the most widely used programming paradigm nowadays. At the very essence, in OOP computer programs are designed by making them out of objects that interact with one another. Object interactions are very close to a human level reasoning and logic.\newline\null
-\quad Objects are instances of different types or classes in OOP terminology. Some classes relate to each other (like a car and a truck), some are independent (a cat and a table). Usually relations form hierarchies and languages provide support for class derivation and inheritance.        
-
-\quad \textit{Encapsulation} is another OOP technique, that is used for protection against object misuse and unintended outside interference. Data and methods of a class concerned with its internal workings are declared \textit{private} to a class, while those designed to form an outward appearance and interface of a class are declared \textit{public}. This facilitates code refactoring, for example allowing the author of the class to change how objects of that class represent their data internally without changing any external code. It also eases a program comprehension and debugging by better localizing functionality and thus possible bugs.
-
-\quad \textit{Dynamic dispatch} is the responsibility of the object, not any external code, to select the procedural code to execute in response to a method call, typically by looking up the method at run time in a table associated with the object. This OOP feature allows a programmer to write a more general code, which works with abstract interface methods and leave the exact method resolution to be made during the running time of a program.
-
-\quad The technique of a dynamic dispatch is closely related to the technique of \textit{inheritance}. Inheritance allows classes to be arranged in a hierarchy that represents "is-a-type-of" relationships. Inheritance can be of two types: interface inheritance and implementation inheritance. The first one allows a parent class to require its descendants to stick to the same interface. A common interface allows the objects of different classes from the same hierarchy to be operated on by the same type agnostic code. The latter is called a \textit{polymorphism}. The user code can be more concise and abstract. The call of the same method on the parent class or one of its descendants can result into a varying behaviour.     
-
-\quad The presence of all the above features makes OOP languages extremely rich with various facilities. That creates a vast design space for software architects and engineers and spawns the whole topic of software design patterns.    
-
-\quad At the end it is the experience, mastery and ingenuity of a programmer which determine the final software design.  
-
-\quad Our computational frameworks use all the above concepts and principles and are based on modern and convenient software design patterns. 
-
-
-
-
-
-
-
-
-
-
-\quad Object-oriented software design is a complex topic in itself, which spawns a number of problems and questions. 
+\subsection{Object-Oriented Programming (OOP)}
+\label{background_oop}
+\quad Object-oriented programming (OOP) is arguably the most widely used programming paradigm nowadays. It is supported by almost all major programming languages. At the very essence, in OOP computer programs are designed by making them out of objects that interact with one another. Object interactions are very close to human level of reasoning and logic and thus the paradigm fits quite naturally to a human developer.\newline\null
+\quad Objects are instances of different types or classes in OOP terminology. Classes are object specifications. They specify the data objects contain (like an integer \textit{age} field for an object of class \textit{Person}), the methods used to operate on the data. Classes define the public part of objects as well as their internal implementation. Object-oriented languages provide a rich set of facilities and fatures to build programs. The major are described below.\newline\null
+\quad \textit{Encapsulation} is another OOP technique, that is used for protection against object misuse and unintended outside interference. Data and methods of a class concerned with its internal workings are declared \textit{private} to a class, while those designed to form an outward appearance and interface of a class are declared \textit{public}. This facilitates code refactoring, for example allowing the author of the class to change how objects of that class represent their data internally without changing any external code. It also eases a program comprehension and debugging by better localizing functionality and thus possible bugs.\newline\null
+\quad \textit{Dynamic dispatch} is the responsibility of the object, not any external code, to select the procedural code to execute in response to a method call, typically by looking up the method at run time in a table associated with the object. This OOP feature allows a programmer to write a more general code, which works with abstract interface methods and leave the exact method resolution to be made during the running time of a program.\newline\null
+\quad The technique of a dynamic dispatch is closely related to the technique of \textit{inheritance}. Inheritance allows classes to be arranged in a hierarchy that represents "is-a-type-of" relationships. Inheritance can be of two types: interface inheritance and implementation inheritance. The first one allows a parent class to require its descendants to stick to the same interface. A common interface allows the objects of different classes from the same hierarchy to be operated on by the same type agnostic code. The latter is called a \textit{polymorphism}. The user code can be more concise and abstract. The call of the same method on the parent class or one of its descendants can result into a varying behaviour.
+\subsection{Software Design Patterns}
+\label{background_design_patterns}
+\quad The presence of all the above features makes OOP languages extremely rich with various facilities. That creates a vast design space for software architects and engineers and spawns the whole topic of software design patterns.  
 
 \quad Software design patterns are reusable solutions to common design problems in object-oriented software engineering. They live at the level higher than that of a source code and are language agnostic. The solutions can be regarded as standard solutions to design problems they target. These solutions have been well tested and proven to be the most reliable and elegant.
 
+\quad At the end it is the experience, mastery and ingenuity of a programmer which determine the final software design.  
+
+\subsection{Computational frameworks as design patterns }
+\label{background_design_patterns_frameworks}
+\quad Our computational frameworks embody all the above concepts and principles and are based on modern and convenient software design patterns. Our frameworks free a programmer from a complex process of a software design.  
+
 Chain of responsibility pattern is very similar to fold.
 Visitor pattern roughly corresponds to fold.
-
 
 \section{Parallel Algorithmic Skeletons}
 
