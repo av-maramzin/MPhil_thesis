@@ -619,7 +619,7 @@ The ML-based predictor developed and assessed in the previous two sections is a 
 \paragraph{Loop Ranking.}
 The loop ranking computed by our parallelization assistant combines a loop's contribution to the overall program execution time with its predicted probability of being parallelizable. In particular, we obtain the ranking by applying a shifted sigmoid function to the predicted parallelizability probability multiplied by the application runtime fraction a loop takes to run as shown in Figure \ref{fig:sigmoid_3d}.
 \begin{figure}[ht]
-\includegraphics[width=0.5\textwidth]{figures/product_func.pdf}
+\includegraphics[width=0.5\textwidth]{images/product_func.pdf}
 \caption{For each loop the ranking function combines its contribution to the application's execution time and its predicted probability of being parallelizable.}
 \label{fig:sigmoid_3d}
 \end{figure}
@@ -629,7 +629,7 @@ The intuition for using this function to combine the two metrics is that it prio
 %With a more detailed examination it is visible, that the shape of the function is chosen in a way, that it ranks parallelisable long-running program loops the highest and tries to amplify all non-parallelisable loops down irrespective of their running time. The effect is better demonstrated with the case study presented on the figure \ref{fig:ft_loop_ranking}, which highlights the contrast between different rankings of FT benchmark loops.
 
 \begin{figure}[ht]
-\includegraphics[width=0.47\textwidth]{figures/ft_filter.pdf}
+\includegraphics[width=0.47\textwidth]{images/ft_filter.pdf}
 \caption{Change of loop rankings with the application of the assistant ranking function for the 46 loops of the FT benchmark. Ranking based on loop execution time alone (top figure) results in some high-ranked, but non-parallelizable loops. Combining profiled execution time and parallelizability in a single score (middle figure) results in a ranking that prioritizes parallelizable loops (bottom figure).}
 \label{fig:ft_loop_ranking}
 \end{figure}
@@ -640,7 +640,7 @@ their efforts trying to parallelize loops which may be long-running, but offer l
 %Top left and right pictures are identical and rank FT benchmark loops according to their running time score (given by the Intel Compiler). The problem with that order is that it ranks long-running program loops the highest independent of their parallelisability. If a programmer starts to parallelise application following that order, he is going to waste his time and efforts on the loops one cannot parallelise anyway. The left and right plots at the bottom of the figure demonstrate a transformation in the loop ranking our assistant does. Vertical axes of these plots correspond to the values our shifted sigmoid ranking function (see figure \ref{fig:sigmoid_3d}) takes. The bottom left plot shows how the relative height of the bars changes with a switch from a loop runtime to our scoring function. It is clear from the plot, that non-parallelisable loops go down in their importance. The bottom right picture shows that such a change actually moves true parallel loops toward the beginning of the list. The longer loop takes to run, the bigger the move. On the other hand non-parallelisable loops move towards the back of the list (almost independent of their running time). The improved ranking of FT loops allows a programmer to immediately start benchmark parallelisation with the most important loops and don't waste time looking at long-running loops, which cannot be parallelised by their nature anyway.
 \begin{comment}
 \begin{figure}[ht]
-\includegraphics[width=0.45\textwidth]{figures/icc_competition_scheme.pdf}
+\includegraphics[width=0.45\textwidth]{images/icc_competition_scheme.pdf}
 \caption{First predictor application. Smart parallelization assistant. }
 \label{fig:icc_competition_scheme}
 \end{figure}
@@ -733,7 +733,7 @@ Figure \ref{fig:icc_competition} shows the relative frequency of different loop 
     %\begin{minipage}{\columnwidth}
     \centering
     %\includegraphics[trim=1mm 1mm 1mm 1mm,clip,width=0.9\columnwidth]{figures/icc_vs_predictor.pdf}
-    \includegraphics[width=0.9\columnwidth]{figures/pie.pdf}
+    \includegraphics[width=0.9\columnwidth]{images/pie.pdf}
     \caption{
       Distribution of loop classification by the ICC Compiler and our predictor.}
     \label{fig:icc_competition}
@@ -743,7 +743,7 @@ Figure \ref{fig:icc_competition} shows the relative frequency of different loop 
 
 \begin{figure*}[t!]
 \centering
-\includegraphics[width=0.95\textwidth]{figures/perf_conv_curves_new.pdf}
+\includegraphics[width=0.95\textwidth]{images/perf_conv_curves_new.pdf}
 \caption{From left to right more loops are parallelized for each benchmark. As we parallelize more loops, program execution times improve over the initial sequential performance and reach the performance level of the reference OpenMP implementations. Our ML based parallelization assistant requires the user to parallelize fewer loops than a purely profile-guided approach to reach the maximum parallel speedup.}
 \label{fig:performance_convergence_line}
 \vspace*{5mm} % Just to fill up the rest of the page

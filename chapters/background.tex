@@ -79,6 +79,16 @@ We measured the running time of NASA Parallel Benchmarks after being compiled wi
 
 \subsection{Limits of Machine Learning based methods}
 \label{background_challenges_ml}
+%We focus our discussion of related work on contributions, which are related to the ML aspects of the approach presented in this paper.
+
+\textit{Profitability Analysis.}
+The SUIF \cite{Wilson:1994:SIR:193209.193217} parallelizing compiler uses a simple heuristic based on the product of statements per loop iteration and number of loop iterations to decide whether a parallelizable loop should be scheduled to be executed in parallel. In contrast, Tournavitis \emph{et al.}~\cite{Tournavitis:2009:THA:1542476.1542496} use a machine learning based heuristic, which incorporates \textit{dynamic} program features collected in a separate profiling stage, to decide if and how a potentially parallel loop should be scheduled across multiple processors.
+
+\textit{ML in Compiler Optimization.}
+Machine learning has been used to solve a wide range of problems, from the early successful work of selecting compiler flags for sequential programs, to recent works on scheduling and optimizing parallel programs on heterogeneous multi-cores. Some works for machine learning in compilers look at how, or if, a compiler optimization should be applied to a sequential program. Some of the previous studies build supervised classifiers to predict the optimal loop unroll factor \cite{4907653,1402082} or to determine whether a function should be inlined \cite{Zhao2003ToIO,1559966}. These works target a fixed set of compiler options, by representing the optimization problem as a multi-class classification problem where each compiler option is a class. Evolutionary algorithms like generic search are often used to explore a large design space. Prior works~\cite{Almagor:2004:FEC:997163.997196,Cooper:2005:AAC:1065910.1065921,Ashouri:2017:MMC:3132652.3124452} have used evolutionary algorithms to solve the phase ordering problem (i.e.\ in which order a set of compiler transformations should be applied).
+
+\textit{Machine Learning and Parallelization.}
+Most relevant to the work presented in this paper is the approach of Fried \emph{et al.}~\cite{fried_ea:2013:icmla}. Similar to our approach, Fried \emph{et al.} train a supervised learning algorithm on code hand-annotated with OpenMP parallelization directives in order to approximate the parallelization that might be produced by a human expert. However, we do not rely solely on OpenMP annotations, but we complement our training set with substantially richer data obtained from an aggressively configured parallelizing compiler. While Fried \emph{et al.}~focus on the comparative performance of different ML algorithms, we contribute a practical parallelization assistant capable of ranking loop candidates in their order of merit. Through this we directly enhance programmer productivity in an ML-assisted environment. Similarly to our approach, Hayashi \emph{et al.}~\cite{Hayashi:2015:MPH:2807426.2807429} extracts various program features during compilation for use in a supervised learning prediction model. However, its aim is the optimal runtime selection of CPU vs. GPU execution and it is limited to programs written in Java using the parallel stream APIs that was introduced in version 8.
 
 \subsection{Data-Centric problem}
 \label{background_challenges_dcp}
@@ -179,6 +189,79 @@ Chain of responsibility pattern is very similar to fold.
 Visitor pattern roughly corresponds to fold.
 
 \section{Parallel Algorithmic Skeletons}
+
+\section{Benchmarks Studies}
+\label{background_benchmarks}
+\quad In our projects we used three benchmark suites. We trained our machine learning based loop parallelization assistant with Seoul National University's implementation of the NASA Parallel Benchmarks (NPB) \cite{snu-npb-benchmarks}. For the data-centric parallelization project we started with the SPEC CPU2006 benchmarks. The complexity of these and the perspective we derived for the SPEC CPU2006 suite study led us to a simpler suite of Olden benchmarks. We used the latter for the project of computational frameworks.\newline\null
+\quad Below we provide descriptions of the benchmarks so a reader can develop a better feel for the problems we tackle and the code we work with.\newline\null
+\subsection{NASA Parallel Benchmarks (NPB)}
+\label{background_benchmarks_npb}
+
+\subsection{SPEC CPU2006}
+\label{background_benchmarks_spec}
+\quad The project of Data-Centric Parallelization (DCP) started with the feasibility studies of the SPEC CPU2006 benchmark suite. We studied the feasibility of the automatic data structure recognition techniques on these benchmarks. Although the benchmarks proved to be extremely complex for such techniques, these studies directed our further efforts and ultimately led to the concept of computational frameworks being an inseparable blend of data structures and algorithms. The key lessons we learnt from the SPEC CPU2006 benchmarks are an enormous complexity of the real legacy code and a very close relationship between data structures and algorithms. Let alone automatic techniques, it might take some weeks for an expert engineer to understand what a single benchmark is actually doing. Below we describe some of the benchmarks we looked at.
+\paragraph{429.mcf} The benchmark operates with a complex network of nodes and arcs linearly allocated on the heap memory. Despite the simplicity of allocation, every node and arc has numerous pointers forming several object linking chains. Pointers are set in different places withing the source code base (during allocation as well as during consecutive network structure updates), making the deduction of the actual data structure type a task of the grand complexity. The network forms some sort of a spanning tree with several properties true of its nodes: every node has only one child pointer and if a node has several children, then the latter are connected through sibling pointers starting from the first child.\newline\null
+\quad\textbf{The tree data structure presents a high interest from the point of its recognition. But even a manual source code analysis and transformation requires a serious effort. Static automatic techniques seem infeasible, while dynamic ones seem to be a grand challenge.}
+\paragraph{456.hmmer} Searches a DNA sequence database given a Profile Hidden Markov Model (HMM). The benchmark uses Viterbi algorithm. The implementation works with four dynamic programming matrices allocated linearly as arrays. Algorithm walks either horizontally or diagonally along these matrices and computes reductions of maps. The computation is parallelizable and there has been successful works \cite{Ganesan:2010:AHG:1854776.1854844}\cite{inria} doing it manually for the specialized hardware.\newline\null
+\quad\textbf{Despite the complexity of its core function \textit{P7Viterbi()}, the benchmark presents a very high interest for the application of our computational frameworks. Reductions of maps perfectly fit the purpose. We view it as a future work.}
+\paragraph{400.perlbench} This benchmark is a cut-down Perl interpreter, which implements the regular expression matching state machine. The benchmark processes the bitcode of a compiled regular expression instruction by instruction. Although, instructions have the same size and are laid out linearly in memory, there might be branches and the whole processing happens in a linked-list offset directed fashion. That requires sequential execution and is far beyond the capabilities of any existent techniques.
+\quad\textbf{The benchmark is neither parallel nor a simple one. It makes no point to apply any recognition techniques here.}
+\paragraph{470.lbm} The benchmark implements a Lattice Boltzmann Method (LBM) and is a relatively simple one (around ~1400 LOC). The main underlying data structures our benchmark works with are the two 3D grids mapped onto a linear array space, which simulate incompressible fluids in 3D. The benchmark runs a specified number of time steps. During each time step the benchmark linearly runs along \textit{Src} array. Every array element represents a point from a 3D grid and consists of a number of velocity vector projections (South, North, East, West, Top, Bottom,  ... , South-East, etc.) at this point. The values of these projections are being combined and mapped in a stencil fashion onto adjacent elements of independent \textit{Dst} array. The computation is highly parallel and corresponds to a sweeping of \textit{xy} planes (one plane after another) along \textit{z} axis. The benchmark has already been parallelised with an OpenMP pragma in a per element fashion. This benchmark could potentially be used for the discovery of stencil computational idioms. Linear arrays being used in the benchmark do not represent a huge amount of interest from a data-centric point.\newline\null
+\quad\textbf{The benchmark operates with 3D grids laid out on regular arrays. The latter do not present a great deal of interest from the point of data structure recognition. It would be interesting to try to recognize an algorithmic stencil.}
+
+\subsection{Olden}
+\label{background_benchmarks_olden}
+\quad Although our studies of SPEC CPU2006 benchmarks have proved their enormous complexity for the task of automatic data structure recognition, we have managed to get a good perspective and narrow our research path to a much simpler suite of Olden benchmarks. Computations and algorithmic patterns present in Olden benchmarks have ultimately led us to the concept of computational frameworks.\newline\null
+\quad Olden benchmark suite consists of 10 benchmarks. For our project we looked at 6 of those (bisort, health, perimeter, treeadd, mst and tsp benchmarks). The nature of different Olden benchmarks varies. Benchmarks health, treeadd and perimeter perform essentially the same computational pattern, but for different problems. We call that pattern a fractal. The latter is a computational framework, i.e the blend of a parallelizible algorithmic skeleton and a tree-based data structure. Different tree branches are being processed independently. Benchmarks tsp and mst solve 2 well-known graph problems namely travelling salesman problem and minimum spanning tree. The other 4 benchmarks perform scientific numerical computations and are bigger, more complex and less interesting from the point of data structure recognition.
+\paragraph{bisort}
+\textit{\textbf{Definition} A sorted sequence is a monotonically non-decreasing (or non-increasing) sequence. A bitonic sequence is a sequence with $x_{0} \leq ... \leq x_{k} \geq ... \geq x_{n} - 1$ for some k, or a circular shift of such a sequence.}\newline\null
+\quad The sequence is based on a binary tree implementation (recursive calls to left and right subtrees). The algorithm is based on a sorting comparator network consisting of several layers. The network can be and is implemented in a divide and conquer way similar to that of a well-known merge sort. Sort() function is called on the left and right array halves recursively. The merging step of the merge sort algorithm is substituted with compare-and-swap step. The latter is possible due to input sequences required to be bitonic.
+\quad\textbf{The benchmark is heavily based on pointers, tree swaps and rotations. It presents an interest from the point of divide and conquer algorithm recognition. Static techniques are unlikely to handle the legacy source code of that complexity and style. Dynamic techniques might be able to see the binary tree.}
+
+\paragraph{health} The most promising of all Olden benchmarks. Columbian health care system simulation is based on a complete 4-ary tree of $4^{max\_level}$ adjacent villages. Each village has its own hospital and is connected to 4 adjacent child villages. Simulation starts from the top (tree root village and goes down all the tree branches recursively right to left.
+Every simulation step consists of several stages:
+\begin{enumerate}
+  \item Accept all patients from adjacent villages and put them in the local hospital for an initial assessment and possibly for further hospitalization inside the local hospital.
+  \item Check patients who are inside the local hospital: once inside patients spend time to recover and occupy 1 member of the staff throughout all time. If time have passed then the patient is checked out and releases 1 personnel member.
+  \item Check patients on the assessment list. Patients require some time to be diagnosed. Each patient occupies 1 member of the staff throughout the whole assessment process. If patient is ill then he continues to occupy the same personnel member and goes inside the hospital. If patient is healthy then the patient is checked out and releases 1 staff member.
+  \item Check patients on the waiting list. Once a patient gets into the hospital he/she takes on 1 member of the staff if the personnel is available. If not, then the patient goes onto the waiting list. Patient passes through 2 phases: assessment and hospitalisation. Each patient is being supervised by 1 member of the personnel starting from assessment and up until checking out of the hospital. If after assessment a patient turns out to be healthy then the patient is checked out and a personnel member is returned back to available pool. If patient is confirmed ill, then the former is put inside the hospital and spends time there. Patients fall ill at the will of a random number generator.
+\end{enumerate}
+
+\textbf{The benchmark operates with quad tree structures and does it in a highly parallel fashion. In our work we call that pattern a fractal. The latter is a computational framework, i.e. the blend of an algorithm and a data structure. The whole structure can be aimed at for an automatic recognition (not just a separate tree or an algorithmic skeleton, but both) even with static techniques.}
+
+\paragraph{perimeter} The benchmark computes the perimeter of a ring (R=2048, r=1024). The ring is mapped onto a grid of elements by painting all the grid elements inside the ring ($r^{2} < x*x + y*y < R^{2}$) as black and all grid elements outside of it as white. Then the grid is being traversed in two different (implementation dependent) ways and detects all flips of color (black to white and vice versa) to sum them up into the final perimeter approximation. The grid is implemented as a quad tree based fractal. The initial square is split into 4 parts (northwest, northeast, southwest, southeast), which in their turn split further on. The process reminds the fractal framework from the health benchmark.  
+
+\paragraph{power} The second by importance is the power pricing computation benchmark. The benchmark is based on a composite structure of C arrays and pointer-based linked lists of various objects such as Root, Laterals, Branches and Leaves. Figure \ref{fig:power_benchmark} illustrates the data structure. The algorithm is basically composed of folds and reductions. C arrays are reduced and linked lists are folded. The algorithm works recursively and starts with the Root::compute() call. The method accumulates power demand
+Demand(P,Q) from all lists of Laterals. Accumulation starts with the end of each list. Each lateral accumulates its power demand from all its branches and the latter in turn accumulate power demand from all their leaves. The leaves call
+optimize\_node() method, which does a chunk of scientific computations (gradients, vectors, etc.), which compute P and Q. Finally, Root::compute() is called iteratively from a while
+loop of power\_pricing\_problem(). Iteration continues up until P and Q error becomes less than the required epsilon. 
+\begin{figure}[ht]
+\includegraphics[width=1.0\textwidth]{images/power_scheme.pdf}
+\caption{The Power benchmark.}
+\label{fig:power_benchmark}
+\end{figure}
+
+\paragraph{treeadd} The treeadd benchmark is a very small and simple one. It does a recursive reduction on a pointer-linked binary tree. To create a workload the reduction is done repetitively inside the loop.   
+
+\paragraph{mst} Minimum Spanning Tree (MST) benchmark does a MST weight computation of a complete graph. Computation is approximate and the algorithm looks like it might finish with incorrect result. Nevertheless, the benchmark can be used for the purpose of computational workload. Graph is represented as a linked list of vertices. Every node in the list has a hash table of incident edges. Graph is complete: each vertex is connected to all other vertices in the graph (except itself). Algorithm repeatedly traverses the list of vertices and gradually accumulates the MST weight. On every traversal algorithm picks the node in the list to use as an input for the next traversal. In that sense, there is a cross iteration/traversal dependency. The code below summarises the benchmark.\newline\null
+\begin{minipage}[t]{\linewidth}
+\begin{lstlisting}[caption={The main algorithm of mst benchmark.},label={lst:mst_code},language=C]
+vertex = list;
+list = list->next;
+while (num_vertices) {
+    ret = traverse_vertex_list(vertex, list);
+    mst_weight += ret.distance; // accumulate the final result
+    vertex = ret.vertex; // next vertex to measure the distance against
+    num_vertices--;
+}
+return mst_weight;
+\end{lstlisting}
+\end{minipage}
+
+\paragraph{tsp} Travelling Salesman Problem (TSP). The benchmark generates a set of dots scattered on a 2D plane. Dots represent cities and are specified by their (x,y) coordinates. The TSP problem is to visit all the cities and return to the city of origin having passed the minimal distance. In other words, the algorithm returns a cycled sequence of cities, where proximity of elements in the sequence in terms of order means their spatial proximity on the 2D plane.\newline\null
+\quad The algorithm’s work resembles that of an insertion sort. The sequence is divided into 2 parts. Ordered part and unordered part. At first, ordered part consists of just 1 element. On every iteration the algorithm takes the next element out of unordered part, finds it a pairing element inside the ordered part (with the minimal distance between them) and inserts the element into the ordered subsequence next to its pair. At the end we get the sequence with the property that closest dots stand the closest in the sequence.\newline\null
+\quad The benchmark is based on a binary tree being transformed into doubly linked list. Every node of the tree represents a city located on 2D plane with randomly generated (x,y) coordinates. The build\_tree() method is written in a way to generate a uniform distribution of dots on the plane.
+
 
 
 
