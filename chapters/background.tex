@@ -1,38 +1,60 @@
 \chapter{Background}
 \label{background}
-\quad \textit{Parallel computing} and \textit{software parallelization} are vast, overlapping and complementary computer science areas with a history dating back to 1950s. With the advances in semiconductor industry the topics have left the niche of high-end scientific supercomputers and spread to a much wider area spanning across all consumer electronic devices and have become the topics of the major importance.\newline\null
-\quad Nowadays the parallelism is pervasive. Parallel hardware is omnipresent across the whole wide spectrum of computing systems. In order to exploit all the hardware capabilities the software has to be parallel as well. And thus, every computer scientist and software developer would benefit from having an insight into the area. Nonetheless, the topics are extremely difficult, require a serious time investment and a great deal of knowledge in various subdomains. It is not always practical to expect from an average programmer to possess such a deep expertise. For that reason we propose a solution aimed at alleviating the challenging task of manual software parallelization. Our solution consists of two components. We describe them in chapters \ref{assistant} and \ref{computational_frameworks}.\newline\null
-\quad In this chapter we accumulate the material, which lays the ground for descriptions of our proposed solutions in chapters \ref{assistant} and \ref{computational_frameworks}. We relied on parallel computing tutorials from Lawrence Livermore National Laboratory (LLNL) \cite{llnl_computing} to prepare the material. Section \ref{parallel_computing_importance} stresses the importance of parallel computing and software parallelization. Section [] presents the challenges of manual and then automatic software parallelization. These challenges form the ground for our assistant solution to grow on. Then, in section [] we discuss the problem of data structure choice and how it affects software parallelization. We present a thorough literature review on the topic of Data Centric Parallelization (DCP) dealing with the task of automatic data structure recognition. Our review concludes that automatic techniques are still an unsolved grand challenge. Data structures are often inseparable with algorithms the former support. Our computational frameworks we propose in chapter \ref{computational_frameworks} grow on the inseparability fact and are a blend of data structures and algorithms. Furthermore, the modern software design and engineering tasks are extreamly rich and complex topics. In sections [] and [] we talk about imperative, functional and object-oriented programming paradigms, as well as various OOP software design patterns. Our computational frameworks take the best principles and alleviate the task of software architecture design for an average programmer.        
+
+% Parallel computing and software parallelization are vast, complementary and overlapping areas omnipresent across the whole spectrum of hardware. The topics of major importance.
+
+\quad \textit{Parallel computing} and \textit{software parallelization} are vast, overlapping and complementary computer science areas with a history dating back to 1950s. With the advances in semiconductor industry the topics have left the niche of high-end scientific supercomputers and spread to a much wider area spanning across all consumer electronic devices and have become the topics of the major importance.
+
+% Parallel computing and software parallelization are vast, complementary and overlapping areas omnipresent across the whole spectrum of hardware. The topics of major importance.
+
+\quad Nowadays the parallelism is pervasive. Parallel hardware is omnipresent across the whole wide spectrum of computing systems. In order to exploit all the available hardware capabilities the software has to be parallel as well. And thus, every computer scientist and software developer would benefit from having an insight into the area. Nonetheless, the topics are extremely difficult, require a serious time investment and a great deal of knowledge in various subdomains. It is not always realistic to expect from an average programmer to possess such a deep expertise. For that reason we propose a solution aimed at alleviating the challenging task of manual software parallelization. Our solution consists of the two components. We describe them in chapters \ref{assistant} and \ref{frameworks}.
+
+% Background chapter as the point of basic material accumulation. Based on LLNL tutorials!
+
+\quad In this chapter we accumulate and structure the material, which stresses the importance of software parallelization, highlights its challenges, describes the parallel software engineering process and finally lays the ground for our proposed solutions from chapters \ref{assistant} and \ref{frameworks}. We express our special gratitude to Lawrence Livermore National Laboratory (LLNL) \cite{llnl_computing} for their great parallel computing tutorials. We heavily relied on those to prepare the material of this chapter.
+
+% The story line:
+%
+% Parallel computing importance
+% Challenges of software parallelization:
+%     automatic
+%     manual
+%     machine learning based
+%     data-centric parallelization problem
+% 
+%
+
+\quad The background chapter goes as follows. Section \ref{background_importance} stresses the importance of parallel computing and software parallelization in the modern world. There are numerous software parallelization methods and techniques, but all of them run into their specific challenges and problems. Section \ref{background_challenges} highlights the major problems of various software parallelisation methods. First, it presents the challenges of manual and then automatic software parallelization techniques. There have been various experiments and works employing machine learning (ML) based methods for the task of software parallelization. These challenges form the ground for our program loop parallelization assistant solution to grow on. We describe our solution in chapter \ref{assistant}. Then, in section \ref{background_challenges_dcp} we discuss the problem of data structure choice and how it affects the software parallelization. We present a thorough literature review on the topic of Data Centric Parallelization (DCP) dealing with the task of automatic data structure recognition. Our review concludes with that an automatic data structure recognition techniques are still an unsolved grand challenge. Data structures are often inseparable with algorithms the former support. Our computational frameworks grow on the inseparability fact and form the blend of data structures and algorithms. We propose our solution to the problem in chapter \ref{frameworks}. Furthermore, the modern software design and engineering tasks are extremely rich and complex topics. That is true of parallel software engineering as well of course. In sections \ref{background_paradigms} and \ref{background_oop_design_patterns} we talk about imperative, functional and object-oriented programming paradigms, as well as various OOP software design patterns. Our computational frameworks take the best out of their principles and alleviate the task of software architecture design for an average programmer.
 
 \section{The importance of parallel computing}
-\label{background_parallel_computing_importance}
-\quad The parallelism is pervasive and the future of computing is parallel. There are numerous factors which stress the importance of parallelism in modern computing.
+\label{background_importance}
+\quad The parallelism is pervasive and the future of computing is parallel. There are numerous factors which stress the importance of parallelism in the modern computing world.
 \begin{description}
 \item[Abundance of natural parallelism] The field of High Performance Computing (HPC) has traditionally been concerned with scientific modelling and simulation of various natural phenomena (climate change, fluid flows, etc.). Such systems consist of numerous often independent parts. When we compile a highly parallel algorithm to a serial sequence of CPU instructions or process a huge data set with independent parts sequentially we are artificially constraining a vastly parallel computation to a serial one. Parallelism is not limited to a natural world, instead many algorithms have inherent parallelism in them.
-\item[Semiconductor technology advances and power limits] With advances in transistor density it became possible to design more complicated CPUs. Initially the trend went into deeper pipelines, but running into power limits the industry design shifted towards multi core CPUs and multiprocessor systems. Such systems require of software to mirror the trend and become parallel.
+\item[Semiconductor technology advances and power limits] With advances in transistor density it became feasible to design more complicated CPUs. Initially the trend went into deeper pipelines, but running into power limits the industry design shifted towards multi core CPUs and multiprocessor systems. Such systems require of software to mirror the trend and become parallel as well.
 \item[Domain inherent parallelism and specialized computations] The areas like computer graphics for instance have a lot of problems that can be processed in a Single Instruction Multiple Data (SIMD) fashion. That naturally led to specialized co-processors like GPUs. The hardware systems grow complex and heterogeneous.
 \end{description}
 
 \section{Challenges in Software Parallelization}
 \label{background_challenges}
-\quad The problem of software parallelization is extremely complex and multi-faceted. There are various approaches to the problem, but all of them have their pros and cons. Although, the process of software parallelization has characteristically been a very manual task, which is time-consuming and error-prone, there are also automatic and machine learning based approaches to the problem. In this section we highlight inherent challenges of these approaches. The solution we propose aims to address these challenges. 
+\quad The problem of software parallelization is extremely complex and multi-faceted. There are various approaches to the problem, but all of them have their pros and cons. Although, the process of software parallelization has characteristically been a very manual task, which is time-consuming and error-prone, there are also automatic and machine learning based techniques. In this section we highlight inherent challenges of these approaches. The solution we propose aims to address all of these. 
 
-\subsection{Manual Parallelization Difficulties}
+\subsection{Manual Parallelization Challenges}
 \label{background_challenges_manual}
 \quad Software parallelization has characteristically been a very manual process. As any software development process it consists of a number of stages and parts. The major problems are described below.
 \begin{description}
 \item[Problem understanding and partitioning] As the best software engineering practices dictate, before diving into software development one needs to thoroughly understand the problem to be solved and decide on the requirements and restrictions the final piece of software must meet. The whole algorithm and software architecture might change with the decision of developing a parallel software version instead of a serial one. If one starts from an already implemented serial software version, the parallelization might be even more difficult to do. Source code comprehension is a hard task. The algorithm chosen for a serial version might be completely unsuitable for a parallel implementation. The problem must be partitioned into relatively independent chunks of work to be processed in parallel. The partitioning can be done in numerous ways and a programmer needs to choose the way to do that (data set decomposition, functional decomposition or a hybrid of the two).
 \item[Communications and synchronization] Very often the parts of the problem to solve are not completely independent and require an exchange of information. Designing the way that exchange is going to work is a complex task. Almost always communication results into an overhead. Sending the data over congested network or waiting on a synchronization barrier all that slows the program down. The slowdown might even diminish all performance benefits obtained from parallelization.
-\item[Implementation and data dependencies] When problem partitioning is done, all communication and synchronization points are determined and the high level parallel algorithm is designed a programmer might start the actual implementation. Here a programmer will run into other types of problems. Consider two functionally equivalent code samples below.\newline\null
+\item[Implementation and data dependencies] When the problem partitioning is done, all communication and synchronization points are determined and the high level parallel algorithm is designed a programmer might start the actual implementation. Here a programmer will run into other types of problems. Consider two functionally equivalent code samples below.\newline\null
 \begin{minipage}[t]{0.50\linewidth}
-\begin{lstlisting}[caption={Non-parallelisable loop with a planted loop-carried data dependence.},label={lst:code_sample_data_dependence},language=C]
+\begin{lstlisting}[caption={Non-parallelizable loop with planted loop-carried data dependence.},label={lst:code_sample_data_dependence},language=C]
 for (int i=1; i<n; i++) {
   a[i]=a[i-1]+1;
 }
 \end{lstlisting}
 \end{minipage}
 \begin{minipage}[t]{0.50\linewidth}
-\begin{lstlisting}[caption={Parallelisable loop free of any data dependencies.}, label={lst:code_sample_no_data_dependence},language=C]
+\begin{lstlisting}[caption={Parallelizable loop free of any data dependencies.}, label={lst:code_sample_no_data_dependence},language=C]
 for (int i=0; i<n; i++) {
   a[i]=a[0]+i;
 }
@@ -43,14 +65,28 @@ The actual shape of the code can break parallelization by introducing fake (not 
 \item[Performance analysis and tuning] One needs to know where the program's hotspots are. Hotspots are the places where the most of the real work is being done. The majority of programs spend most of the CPU time in a few places. The task of a programmer is to find those places and concentrate all parallelization and optimization efforts right there. Finding hotspots might be difficult before the programmer has the whole program implemented. Modern hardware architectures have a multi level memory hierarchy, memory data prefetchers, TLBs, out-of-order execution, etc. It might be surprising how the actual program execution performance differs from the one inferred from the algorithm. Profilers and other analysis tools can be of help here.
 \end{description}
 \quad Finally, all the above challenges are interrelated and very often depend on each other. Parallel software development process can go iteratively with numerous dead ends and redesign efforts. With a long research history into the topic, all these problems are still actual now.
+
 \subsection{Limitations of Automatic Techniques}
 \label{background_challenges_automatic}
-\quad There are various tools available to assist a programmer in the task of software parallelization. Parallelizing compilers are the most widely used.
+\quad Given the enormous challenges of manual software parallelization there have been numerous attempts to automate the task. There are various tools available to assist a programmer in the task of software parallelization. Parallelizing compilers are the most widely used ones. Below we present their classification
 
-Fully Automatic
-The compiler analyzes the source code and identifies opportunities for parallelism.
-The analysis includes identifying inhibitors to parallelism and possibly a cost weighting on whether or not the parallelism would actually improve performance. Loops are the most frequent target for automatic parallelization. Programmer Directed 
-Using compiler directives or possibly compiler flags, the programmer explicitly tells the compiler how to parallelize the code. May be able to be used in conjunction with some degree of automatic parallelization also. The most common compiler generated parallelization is done using on-node shared memory and threads (such as OpenMP). If you are beginning with an existing serial code and have time or budget constraints, then automatic parallelization may be the answer. However, there are several important caveats that apply to automatic parallelization: Wrong results may be produced Performance may actually degrade Much less flexible than manual parallelization Limited to a subset (mostly loops) of code May actually not parallelize code if the compiler analysis suggests there are inhibitors or the code is too complex 
+\begin{description}[noitemsep]
+\item[Fully Automatic] The compiler analyzes the source code and identifies opportunities for parallelism.
+The analysis includes identifying inhibitors to parallelism and possibly a cost weighting on whether or not the parallelism would actually improve performance. Loops are the most frequent target for automatic parallelization. 
+\item[Programmer Directed] Using compiler directives or possibly compiler flags, a programmer explicitly tells the compiler how to parallelize the code. These directives and flags may be also used in conjunction with some degree of automatic parallelization. The most common compiler generated parallelization is done using on-node shared memory and threads (such as OpenMP).
+\end{description}
+\quad If one is beginning with an existing serial code and have time or budget constraints, then automatic parallelization may be the answer. However, there are several important caveats that apply to automatic parallelization.
+\begin{description}[itemsep=0mm]
+\item[Correctness] Wrong results may be produced.
+\item[Performance] Performance may actually degrade.
+\item[Flexibility] Much less flexible than manual parallelization.
+\item[Limitations] Limited to a subset (mostly loops) of code.
+\item[Effectiveness] May actually not parallelize code if the compiler analysis suggests there are inhibitors or the code is too complex.
+\end{description}
+
+\quad To brightly illustrate the problems automatic software parallelization faces we conducted several experiments with the suite of NAS Parallel Benchmarks (NPB). These benchmarks target performance evaluation of highly parallel supercomputers. Consequently, the suite has a great amount of inherent parallelism and is supposed to be easily parallelizable. Indeed, the suite consists of benchmarks based mostly on flat arrays and loop nests operating with them. There are a lot of simple reductions.     
+
+
 
 \begin{table}
   \begin{minipage}{\pagewidth}
@@ -196,6 +232,19 @@ Visitor pattern roughly corresponds to fold.
 \quad Below we provide descriptions of the benchmarks so a reader can develop a better feel for the problems we tackle and the code we work with.\newline\null
 \subsection{NASA Parallel Benchmarks (NPB)}
 \label{background_benchmarks_npb}
+\quad NAS Parallel Benchmarks (NPB) target performance evaluation of highly parallel supercomputers. There are 10 various benchmarks in the suite. Benchmarks perform various scientific computations. They solve various systems of linear equations, compute gradients, work with matrices (compute matrix transpose, inverse, etc.), solve differential equations, solve heat and diffusion equations on the mesh, compute 3d grids, but all of them work with the simplest flat arrays at the very core.  
+
+
+NPB benchmarks only specify the computation to be done, but do not provide the actual implementation. We used the implementation from Seoul National University (SNU NPB).
+
+These scientific computations posses an enormous amount of inherent parallelism in them, but surprisingly run slower after the automatic parallelization as our experiments from the section \ref{background_challenges_automatic} showed. 
+
+
+Our loop paralleization assistant 
+
+Indeed, the suite consists of benchmarks based mostly on flat arrays and loop nests operating with them. There are a lot of simple reductions.    
+
+
 
 \subsection{SPEC CPU2006}
 \label{background_benchmarks_spec}
