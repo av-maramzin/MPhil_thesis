@@ -11,7 +11,7 @@
 
 % Background chapter as the point of basic material accumulation. Based on LLNL tutorials!
 
-\quad In this chapter we accumulate and structure the material, which stresses the importance of software parallelization, highlights its challenges, describes the parallel software engineering process and finally lays the ground for our proposed solutions from chapters \ref{assistant} and \ref{frameworks}. We express our special gratitude to Lawrence Livermore National Laboratory (LLNL) \cite{llnl_computing} for their great parallel computing tutorials. We heavily relied on those to prepare the material of this chapter.
+\quad In this chapter we accumulate and structure the material, which stresses the importance of software parallelization, highlights its challenges, describes the parallel software engineering process and finally lays the ground for our proposed solutions from chapters \ref{assistant} and \ref{frameworks}. Some sections of the chapter can be skipped. The major ideas leading towards the solutions from chapters \ref{assistant} and \ref{frameworks} are highlighted with bold face text. We express our special gratitude to Lawrence Livermore National Laboratory (LLNL) \cite{llnl_computing} for their great parallel computing tutorials. We heavily relied on those to prepare the material of this chapter.
 
 % The story line:
 %
@@ -24,7 +24,7 @@
 % 
 %
 
-\quad The background chapter goes as follows. Section \ref{background_importance} stresses the importance of parallel computing and software parallelization in the modern world. There are numerous software parallelization methods and techniques, but all of them run into their specific challenges and problems. Section \ref{background_challenges} highlights the major problems of various software parallelisation methods. First, it presents the challenges of manual and then automatic software parallelization techniques. There have been various experiments and works employing machine learning (ML) based methods for the task of software parallelization. These challenges form the ground for our program loop parallelization assistant solution to grow on. We describe our solution in chapter \ref{assistant}. Then, in section \ref{background_challenges_dcp} we discuss the problem of data structure choice and how it affects the software parallelization. We present a thorough literature review on the topic of Data Centric Parallelization (DCP) dealing with the task of automatic data structure recognition. Our review concludes with that an automatic data structure recognition techniques are still an unsolved grand challenge. Data structures are often inseparable with algorithms the former support. Our computational frameworks grow on the inseparability fact and form the blend of data structures and algorithms. We propose our solution to the problem in chapter \ref{frameworks}. Furthermore, the modern software design and engineering tasks are extremely rich and complex topics. That is true of parallel software engineering as well of course. In sections \ref{background_paradigms} and \ref{background_oop_design_patterns} we talk about imperative, functional and object-oriented programming paradigms, as well as various OOP software design patterns. Our computational frameworks take the best out of their principles and alleviate the task of software architecture design for an average programmer.
+\quad The background chapter goes as follows. Section \ref{background_importance} stresses the importance of parallel computing and software parallelization in the modern world. There are numerous software parallelization methods and techniques, but all of them run into their specific challenges and problems. Section \ref{background_challenges} highlights the major problems of various software parallelisation methods. First, it presents the challenges of manual and then automatic software parallelization techniques. There have been various experiments and works employing machine learning (ML) based methods for the task of software parallelization. These challenges form the ground for our program loop parallelization assistant solution to grow on. We describe our solution in chapter \ref{assistant}. Then, in section \ref{background_challenges_dcp} we discuss the problem of data structure choice and how it affects the software parallelization. In section \ref{background_challenges_dcp} we present a thorough literature review on the topic of Data Centric Parallelization (DCP) dealing with the task of automatic data structure recognition. Our review concludes with that an automatic data structure recognition techniques are still an unsolved grand challenge. Data structures are often inseparable with algorithms the former support. Our computational frameworks grow on the inseparability fact and form the blend of data structures and algorithms. We propose our solution to the problem in chapter \ref{frameworks}. Furthermore, the modern software design and engineering tasks are extremely rich and complex topics. That is true of parallel software engineering as well of course. In sections \ref{background_paradigms} and \ref{background_oop_design_patterns} we talk about imperative, functional and object-oriented programming paradigms, as well as various OOP software design patterns. Our computational frameworks take the best out of these principles and alleviate the task of parallel software architecture design for an average programmer.
 
 \section{The importance of parallel computing}
 \label{background_importance}
@@ -201,7 +201,7 @@ for (p=list; p!=NULL; p=p->next) {
 \quad Although, there is still the gap. Some problems contain computations, which are better expressed with standard functional concepts, but at the same time require some state keeping. These problems lie at the boundary of functional and imperative programming. Both paradigms are equally important. In the chapter \ref{computational_frameworks} we propose an idea of \textit{computational frameworks}, which fills that gap. 
 
 \section{OOP and Software Design Patterns}
-\label{background_oop_design_patterns}
+\label{background_oop_design}
 \subsection{Object-Oriented Programming (OOP)}
 \label{background_oop}
 \quad Object-oriented programming (OOP) is arguably the most widely used programming paradigm nowadays. It is supported by almost all major programming languages. At the very essence, in OOP computer programs are designed by making them out of objects that interact with one another. Object interactions are very close to human level of reasoning and logic and thus the paradigm fits quite naturally to a human developer.\newline\null
@@ -210,7 +210,7 @@ for (p=list; p!=NULL; p=p->next) {
 \quad \textit{Dynamic dispatch} is the responsibility of the object, not any external code, to select the procedural code to execute in response to a method call, typically by looking up the method at run time in a table associated with the object. This OOP feature allows a programmer to write a more general code, which works with abstract interface methods and leave the exact method resolution to be made during the running time of a program.\newline\null
 \quad The technique of a dynamic dispatch is closely related to the technique of \textit{inheritance}. Inheritance allows classes to be arranged in a hierarchy that represents "is-a-type-of" relationships. Inheritance can be of two types: interface inheritance and implementation inheritance. The first one allows a parent class to require its descendants to stick to the same interface. A common interface allows the objects of different classes from the same hierarchy to be operated on by the same type agnostic code. The latter is called a \textit{polymorphism}. The user code can be more concise and abstract. The call of the same method on the parent class or one of its descendants can result into a varying behaviour.
 \subsection{Software Design Patterns}
-\label{background_design_patterns}
+\label{background_design}
 \quad The presence of all the above features makes OOP languages extremely rich with various facilities. That creates a vast design space for software architects and engineers and spawns the whole topic of software design patterns.  
 
 \quad Software design patterns are reusable solutions to common design problems in object-oriented software engineering. They live at the level higher than that of a source code and are language agnostic. The solutions can be regarded as standard solutions to design problems they target. These solutions have been well tested and proven to be the most reliable and elegant.
@@ -218,7 +218,7 @@ for (p=list; p!=NULL; p=p->next) {
 \quad At the end it is the experience, mastery and ingenuity of a programmer which determine the final software design.  
 
 \subsection{Computational frameworks as design patterns }
-\label{background_design_patterns_frameworks}
+\label{background_design_frameworks}
 \quad Our computational frameworks embody all the above concepts and principles and are based on modern and convenient software design patterns. Our frameworks free a programmer from a complex process of a software design.  
 
 Chain of responsibility pattern is very similar to fold.
@@ -232,15 +232,18 @@ Visitor pattern roughly corresponds to fold.
 \quad Below we provide descriptions of the benchmarks so a reader can develop a better feel for the problems we tackle and the code we work with.\newline\null
 \subsection{NASA Parallel Benchmarks (NPB)}
 \label{background_benchmarks_npb}
-\quad NAS Parallel Benchmarks (NPB) target performance evaluation of highly parallel supercomputers. There are 10 various benchmarks in the suite. Benchmarks perform various scientific computations. They solve various systems of linear equations, compute gradients, work with matrices (compute matrix transpose, inverse, etc.), solve differential equations, solve heat and diffusion equations on the mesh, compute 3d grids, but all of them work with the simplest flat arrays at the very core.  
+\quad NAS Parallel Benchmarks (NPB) target performance evaluation of highly parallel supercomputers. There are 10 various benchmarks in the suite. Benchmarks perform various scientific computations. They solve various systems of linear equations, compute gradients, work with matrices (compute matrix transpose, inverse, etc.), solve differential equations, solve heat and diffusion equations on the mesh, compute 3d grids, but all of them work with the simplest flat arrays at the very core. 
+
+
+
+All these reasons make NPB benchmarks inherently parallel. Nonetheless, their automatic parallelization with the Intel Compiler did not improve the running time significantly. And for some benchmarks it even brought a slowdown. The effects of automatic parallelization can be seen in figure \ref{fig:benchmarks_runtime}. 
 
 
 NPB benchmarks only specify the computation to be done, but do not provide the actual implementation. We used the implementation from Seoul National University (SNU NPB).
+section \ref{background_challenges_automatic} showed. 
 
-These scientific computations posses an enormous amount of inherent parallelism in them, but surprisingly run slower after the automatic parallelization as our experiments from the section \ref{background_challenges_automatic} showed. 
 
-
-Our loop paralleization assistant 
+Our machine learning based loop parallelization assistant. 
 
 Indeed, the suite consists of benchmarks based mostly on flat arrays and loop nests operating with them. There are a lot of simple reductions.    
 
@@ -267,7 +270,17 @@ Indeed, the suite consists of benchmarks based mostly on flat arrays and loop ne
 \quad The sequence is based on a binary tree implementation (recursive calls to left and right subtrees). The algorithm is based on a sorting comparator network consisting of several layers. The network can be and is implemented in a divide and conquer way similar to that of a well-known merge sort. Sort() function is called on the left and right array halves recursively. The merging step of the merge sort algorithm is substituted with compare-and-swap step. The latter is possible due to input sequences required to be bitonic.
 \quad\textbf{The benchmark is heavily based on pointers, tree swaps and rotations. It presents an interest from the point of divide and conquer algorithm recognition. Static techniques are unlikely to handle the legacy source code of that complexity and style. Dynamic techniques might be able to see the binary tree.}
 
-\paragraph{health} The most promising of all Olden benchmarks. Columbian health care system simulation is based on a complete 4-ary tree of $4^{max\_level}$ adjacent villages. Each village has its own hospital and is connected to 4 adjacent child villages. Simulation starts from the top (tree root village and goes down all the tree branches recursively right to left.
+\paragraph{health} Out of all Olden benchmarks the health fits into the fractal computational framework the best and delivers the most promising performance results. All that has to do with certain properties of the benchmark. Health benchmark does a simulation of the Columbian healthcare system and is based on a complete 4-ary tree of $4^{max\_level}$ adjacent villages, where \textit{max\_level} is the depth of the tree. One can view the tree as the hierarchical structure reflecting various levels of municipal divisions: the root is the capital, leaves represent villages and the nodes on intermediate tree levels represent small towns and bigger cities. The closer to the root, the bigger the settlement and the level of hospital expertise is higher as well. Every tree node has its own hospital. Figure \ref{fig:health_benchmark} illustrates the tree. 
+\begin{figure}[ht]
+\includegraphics[width=1.0\textwidth]{images/village_tree.pdf}
+\caption{The \textbf{health} benchmark. Columbian healthcare system simulation.}
+\label{fig:health_benchmark}
+\end{figure}
+\quad Simulation starts from the top (tree root village and goes down all the tree branches recursively right to left.
+
+
+
+
 Every simulation step consists of several stages:
 \begin{enumerate}
   \item Accept all patients from adjacent villages and put them in the local hospital for an initial assessment and possibly for further hospitalization inside the local hospital.

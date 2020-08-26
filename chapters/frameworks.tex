@@ -59,7 +59,7 @@ sequential program a programmer can work with its instructions directly by
 \quad In this chapter we propose an idea of \textbf{computational frameworks}. Computational frameworks are a higher level entities, which embody the principles of both imperative and functional programming styles. Computational frameworks make certain programming tasks easier to address. These tasks can be outlined by the properties 
 
 \subsection{Motivating example}
-\label{computational_frameworks_motiva}
+\label{frameworks_motivating_example}
 \quad Let's consider a motivating example highlighting the essence of the idea of computational frameworks. Suppose we want to calculate a \textit{left fold} updating its elements with corresponding folded values.\newline\null
 \quad We can code that simple computation using C++ Standard Template Library (STL). Listing \ref{lst:left_fold_list} shows the code implementing the task with a list class template. First, we construct a list with 5 elements and initialize them. Then we loop through the list updating its elements and return the final left folded value. The task is small and the code is concise, but it is still possible to see its drawbacks. The code does not clearly separate concerns: list traversal, result computation and transformation of list elements are all mixed up together. For a better structuredness it would make sense to put these different pieces of functionality into separate places. Alternatively, we could use STL's std::accumulate() function template. The latter provides a programmer with a more concise and abstract interface, but does not allow any side effects. We would still need to write a separate chunk of code aimed at an update of list elements.\newline\null 
 \quad In our project we propose an idea of computational frameworks. Listing \ref{lst:left_fold_framework} shows an alternative implementation of left fold using our Fold computational framework. In order to use it a programmer has to be familiar with the concept of functional fold. The underlying implementation of the fold logic is a list traversal, which forms the backbone of the computation and is hidden behind the user interface our framework provides. 
@@ -131,19 +131,20 @@ int main() {
 \begin{itemize}
 \renewcommand\labelitemi{$\vartriangleright$}
 \renewcommand\labelitemii{$\bullet$}
-\item We propose a novel idea of computational frameworks as a higher level construct blending algorithms and data structures and representing both functional and imperative programming paradigms.
+\item We propose a novel idea of computational frameworks as a higher level construct assisting the process of parallel software engineering. The construct blends algorithms and data structures as well as represents both functional and imperative programming paradigms.
 \item We developed a prototype C++ class template library. The library provides a modern user interface inspired by The LLVM Pass Framework and is based on the modern C++ and OpenMP parallel implementation.
 \item We have rewritten Olden benchmarks to use our library. Original legacy C implementation has now been turned into the modern and well-structured C++ version with parallel and sequential options.
 \item We conducted a thorough study of benchmarks behaviour and the running time of the library. All benchmarks demonstrate significant speedups of several times with bigger workloads to the original legacy C sequential version.
+\item As a future work, we propose an alternative to existent software parallelization scheme.
 \end{itemize}
 
 \section{Computational Frameworks}
 \label{computational_frameworks_main}
-\quad In this work we propose an idea of \textbf{computational frameworks} and we show its utility and use on a subset of Olden benchmarks. The idea grows on a wide review of the available parallel software development methodologies as well as on the understanding of problems in the task of software parallelization.  
+\quad In this work we propose an idea of \textbf{computational frameworks} and we show its utility and use on a subset of Olden benchmarks. The idea grows on a wide review of the available parallel software development methodologies as well as on the understanding of problems in the task of software parallelization.
 
 \subsection{The concept}
 \label{frameworks_concept}
-\quad In our project we propose a novel notion of computational frameworks. 
+\quad In our project we propose a novel notion of computational frameworks.
 
 The notion of computational frameworks has been inspired by the current problems in the software parallelization field. 
 
@@ -247,6 +248,135 @@ class Framework {
 
 of 4 Olden benchmarks: health, perimeter, treeadd and power. The table below shows the performance gains our versions have over old sequential implementations.   
 
+\section{Future work}
+\label{frameworks_future_work}
+\quad The concept of computational frameworks and the prototype library form the basis for the future work. We believe that the process of software parallelization with the help of computational frameworks can be further automated for a relatively simple applications (like Olden benchmarks). To back this feeling let's consider the health benchmark from the Olden suite. In particular, let's consider the grow() method, which allocates and grows the tree of villages.
+\quad Listing \ref{lst:future_work_original} shows the original \textit{alloc\_tree()} function. It takes an integer argument \textit{level}, which specifies the depth of the tree to grow, then it takes an integer seed \textit{label} to initialize the element and a pointer \textit{back} to link the parent node to its children. In the body of the function we allocate dynamic memory for the node using \textit{malloc} call and call the \textit{alloc\_tree} function recursively in a loop of 4 iterations. The function returns a pointer to the created child subtree and the loop at the bottom of procedure links these pointers to a newly allocated and initialized node. For the initialization we calculate the number of personnel in a hospital and prepare the various lists of patients (waiting, inside, assessment, returned, etc.).\newline\null
 
+\begin{minipage}[t]{\linewidth}
+\begin{lstlisting}[caption={Computational framework class template skeleton},label={lst:future_work_original},language=C]
 
+struct Village* alloc_tree(int level, int label, struct Village* back) {
+    
+    if (level == 0) {
+        return NULL;
+    } else {
+        struct Village* new;
+        int i;
+        struct Village* fval[4];
+
+        new = (struct Village*) malloc(sizeof(struct Village));
+
+        for (i = 3; i >= 0; i--)
+            fval[i] = alloc_tree(level-1, label*4+i+1, new, i);
+
+        new->back = back;
+        new->seed = label * (IQ + seed); 
+        new->hosp.personnel = (int)pow(2, level - 1);
+        new->hosp.assess.forward = NULL;
+        new->hosp.assess.back = NULL;
+        new->hosp.assess.patient = NULL;
+        new->hosp.waiting.forward = NULL;
+        ...
+        new->returned.patient = NULL;
+
+        for (i = 0; i < 4; i++)
+            new->forward[i] = fval[i];
+
+        return new;
+    }
+}
+
+int main() {
+    struct Village* top = alloc_tree(max_level, 0, top, 0);
+}
+\end{lstlisting}
+\end{minipage}
+
+\quad One can view the recursive creation of the tree with all its node linking and allocation operations as the \textbf{backbone logic}. On the contrary, the node initialization forms a custom part and can be viewed as the \textbf{business logic}. The backbone logic of the health benchmark corresponds to the fractal computational framework. The business logic should go into corresponding customization slots of the framework. So, the high level task is to identify what kind of a backbone logic (what kind of a computational framework) the code is doing, decouple the backbone part from a custom business logic and to insert the business logic into appropriate interfaces of the identified computational framework. Technically, for benchmarks as simple as Olden the technique can work on the level of compiler's front end: source code or an abstract syntax tree (AST). Health benchmark is simple. After we have identified the backbone logic to be that of a fractal, we can simply strip it off. Everything what's left is the business logic. The next step is to insert different parts of the business logic into the right API interfaces of the computational framework. 
+
+\quad Listing \ref{lst:future_work_frameworks} shows what the final code should look like. Here we instantiate the fractal class template and fill its template methods with the extracted business logic. The next seed argument of the \textit{alloc\_tree()} function goes into the separate API slot of the framework, namely \textit{spawn\_child\_seed()}. The initialization of the village hospital goes into an overriden virtual \textit{grow()} method of the fractal element.
+
+\begin{minipage}[t]{\linewidth}
+\begin{lstlisting}[caption={Computational framework class template skeleton},label={lst:future_work_frameworks},language=C++]
+
+void Village::grow(Fractal_t::Seed_t s) {
+    if (this->element_info().level == 0) {
+        return;
+    } else {
+        this->seed = s * (IQ + ::seed); 
+        this->hosp.personnel = (int) pow(2, this->element_info().level-1);
+        this->hosp.assess.forward = NULL;
+        this->hosp.assess.back = NULL;
+        this->hosp.assess.patient = NULL;
+        this->hosp.waiting.forward = NULL;
+        ...
+        this->returned.patient = NULL;
+        return;
+    }
+}
+
+Fractal_t::Seed_t Village::spawn_child_seed(int child_id) {
+    return (4*this->label+child_id+1);
+}
+
+bool Village::growth_stop_condition() {
+    return false;
+}
+
+int main(int argc, char *argv[]) { 
+    Fractal_t fractal;
+    Fractal_t::Seed_t s = 0;
+    fractal.grow(max_level-1, s);
+}
+\end{lstlisting}
+\end{minipage}
+
+\quad We need to fish out of the original code the actual type of the fractal element as well. Listing \ref{lst:future_work_element_original} shows the original definition of the \textit{Village} structure. Listing \ref{lst:future_work_element_frameworks} shows the target source code to be generated, where all data fields and customization parts are framed into the library API.
+
+\begin{minipage}[t]{\linewidth}
+\begin{lstlisting}[caption={Computational framework class template skeleton},label={lst:future_work_element_original},language=C]
+struct Village {
+    struct Village* forward[4];
+    struct Village* back;
+    struct List returned;
+    struct Hosp hosp;   
+    int label;
+    long long seed;
+};
+\end{lstlisting}
+\end{minipage}
+
+\begin{minipage}[t]{\linewidth}
+\begin{lstlisting}[caption={Computational framework class template skeleton},label={lst:future_work_element_frameworks},language=C++]
+using Fractal_Element_t = class Village;
+using Fractal_Seed_t = int;
+const size_t Fractal_Arity = 4;
+using Fractal_t = Fractal<Fractal_Element_t,Fractal_Seed_t,Fractal_Arity>;
+
+class Village : public Fractal_t::Element {
+
+    public:
+        
+        Village(Fractal_t::ElementInfo info) : Fractal_t::Element(info) {}
+        ~Village() {}
+
+        void grow(Fractal_t::Seed_t seed) override;
+        Fractal_t::Seed_t spawn_child_seed(int child_id) override;
+
+        struct List returned;
+        struct Hosp hosp;
+        int label;
+        long long seed;
+};
+\end{lstlisting}
+\end{minipage}
+
+\quad For computation methods the process is alike to the one described above for growth methods. Figure \ref{fig:parallelization_scheme} illustrates the high level scheme of our approach. We call it an alternative parallelization scheme. Contrary to the 
+
+\begin{figure}[ht]
+\includegraphics[width=1.0\textwidth]{images/parallelization_scheme.png}
+\caption{An alternative software parallelization scheme. Works at the level of abstract syntax tree.}
+\label{fig:parallelization_scheme}
+\end{figure}
 
