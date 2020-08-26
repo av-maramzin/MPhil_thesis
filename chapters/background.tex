@@ -84,7 +84,9 @@ The analysis includes identifying inhibitors to parallelism and possibly a cost 
 \item[Effectiveness] May actually not parallelize code if the compiler analysis suggests there are inhibitors or the code is too complex.
 \end{description}
 
-\quad To brightly illustrate the problems automatic software parallelization faces we conducted several experiments with the suite of NAS Parallel Benchmarks (NPB). These benchmarks target performance evaluation of highly parallel supercomputers. Consequently, the suite has a great amount of inherent parallelism and is supposed to be easily parallelizable. Indeed, the suite consists of benchmarks based mostly on flat arrays and loop nests operating with them. There are a lot of simple reductions.     
+\quad To brightly illustrate the problems automatic software parallelization faces we conducted several experiments with the suite of NASA Parallel Benchmarks (NPB). These benchmarks target performance evaluation of highly parallel supercomputers. Consequently, the suite has a great amount of inherent parallelism and is supposed to be a relatively easy parallelizable. NPB benchmarks do not provide the exact implementation, they rather specify what should be computed and how. We used Seoul National University's (SNU) implementation of NPB benchmarks. SNU NPB implementation comes in two versions: sequential legacy C implementation and the one parallelized with OpenMP pragmas. The main data structure used everywhere in the suite is a simple flat array. There are numerous loop nests operating over arrays and simple reductions.\newline\null
+\quad The first experiment we conducted was 
+
 
 
 
@@ -126,43 +128,11 @@ Machine learning has been used to solve a wide range of problems, from the early
 \textit{Machine Learning and Parallelization.}
 Most relevant to the work presented in this paper is the approach of Fried \emph{et al.}~\cite{fried_ea:2013:icmla}. Similar to our approach, Fried \emph{et al.} train a supervised learning algorithm on code hand-annotated with OpenMP parallelization directives in order to approximate the parallelization that might be produced by a human expert. However, we do not rely solely on OpenMP annotations, but we complement our training set with substantially richer data obtained from an aggressively configured parallelizing compiler. While Fried \emph{et al.}~focus on the comparative performance of different ML algorithms, we contribute a practical parallelization assistant capable of ranking loop candidates in their order of merit. Through this we directly enhance programmer productivity in an ML-assisted environment. Similarly to our approach, Hayashi \emph{et al.}~\cite{Hayashi:2015:MPH:2807426.2807429} extracts various program features during compilation for use in a supervised learning prediction model. However, its aim is the optimal runtime selection of CPU vs. GPU execution and it is limited to programs written in Java using the parallel stream APIs that was introduced in version 8.
 
-\subsection{Data-Centric problem}
-\label{background_challenges_dcp}
-\quad As it has already been stated the problem of software parallelisation is multifaceted. There is a vast range of lower level technical issues, which can turn a perfectly parallelisable at a higher level computation into a non-parallelisable implementation. In our ML assistant project (see Chapter \ref{chapter_ml_assistant}) we showed that the main reasons of Intel Compiler failures on SNU NPB benchmarks are alias analysis conservativeness, uninlined function calls and statically unresolvable dependencies. The assistant tool we designed targets these aspects of the software parallelisation problem. But, there are many more reasons leading to non-parallelisable algorithm implementations. Source code listings \ref{lst:array} and \ref{lst:list} brightly illustrate yet another unsolved problem.\newline\null
-\begin{minipage}[t]{0.45\linewidth}
-\begin{lstlisting}[caption={Parallelisable loop operating on a \textbf{linear array}.},label={lst:array},language=C]
-for (int i=0; i<n; it++) {
-  a[i]=a[i]+1;
-}
-\end{lstlisting}
-\end{minipage}
-%
-\begin{minipage}[t]{0.55\linewidth}
-\begin{lstlisting}[caption={Non-parallelisable loop operating on a \textbf{linked-list}.},label={lst:list},language=C]
-for (p=list; p!=NULL; p=p->next) {
-  p->value+=1;
-}
-\end{lstlisting}
-\end{minipage}
-\quad Listings \ref{lst:array} and \ref{lst:list} illustrate two alternative implementations of the same simple computation. We increment all sequence elements by one. Listing \ref{lst:array} implements the sequence with a regular array linearly laid out in the memory. Listing \ref{lst:list} chooses a linked list as an implementing data structure, which leads to a source code non-parallelisability.\newline\null
-\quad The DCP problem is not solved. Automatic methods are limited to relatively simple code bases such as libraries of well known data structures. The most successful methods rely on dynamic analysis and mamory graphs. Static techniques such as shape analysis are undecidable and highly conservative and might not finish in a reasonable time for the real software projects. Section [] gives a detailed literature review on the topic. 
-
-
-\subsection{Parallel Programming Models}
-\quad With a number of various hardware and operating system vendors entering the market with their different hardware architectures and system call interfaces software portability became a serious concern.   
-
-
-
-To combat the problem industry vendors and major organisation came to design industry standards such as POSIX, OpenMP and MPI. 
-
-
-
-\section{Data-Centric Parallelization}
-
-
+\section{Data-Centric Parallelization Problem}
 \label{background_dcp}
-\subsection{The Problem}
-\quad As it has already been stated the problem of software parallelisation is multifaceted. There is a vast range of lower level technical issues, which can turn a perfectly parallelisable at a higher level computation into a non-parallelisable implementation. In our ML assistant project (see Chapter \ref{chapter_ml_assistant}) we showed that the main reasons of Intel Compiler failures on SNU NPB benchmarks are alias analysis conservativeness, uninlined function calls and statically unresolvable dependencies. The assistant tool we designed targets these aspects of the software parallelisation problem. But, there are many more reasons leading to non-parallelisable algorithm implementations. Source code listings \ref{lst:array} and \ref{lst:list} brightly illustrate yet another unsolved problem.\newline\null
+\subsection{The problem}
+\label{background_dcp_problem}
+\quad The problem of data-centric parallelization (DCP) is the central motivation for the concept of computational frameworks we propose. As it has already been stated the problem of software parallelization is multifaceted. There is a vast range of lower level technical issues, which can turn a perfectly parallelizable at a higher level computation into a non-parallelizable implementation. For example, in section \ref{background_challenges_automatic} we showed that the main reasons of Intel Compiler failures on SNU NPB benchmarks are alias analysis conservativeness, uninlined function calls and statically unresolvable dependencies. These reasons do not close the set of all possible parallel algorithm implementation failures. Listings \ref{lst:array} and \ref{lst:list} brightly illustrate a yet another potential implementation failure.\newline\null
 \begin{minipage}[t]{0.45\linewidth}
 \begin{lstlisting}[caption={Parallelisable loop operating on a \textbf{linear array}.},label={lst:array},language=C]
 for (int i=0; i<n; it++) {
@@ -178,8 +148,8 @@ for (p=list; p!=NULL; p=p->next) {
 }
 \end{lstlisting}
 \end{minipage}
-\quad Listings \ref{lst:array} and \ref{lst:list} illustrate two alternative implementations of the same simple computation. We increment all sequence elements by one. Listing \ref{lst:array} implements the sequence with a regular array linearly laid out in the memory. Listing \ref{lst:list} chooses a linked list as an implementing data structure, which leads to a source code non-parallelisability.\newline\null
-\quad In the project of "Data-Centric Parallelisation (DCP)" we would like to automatically recognise 
+\quad The above code snippets present two alternative implementations of the same simple and embarrassingly parallel computation. We increment all sequence elements by one. Listing \ref{lst:array} implements the sequence with a regular array linearly laid out in the memory. Listing \ref{lst:list} chooses a linked list as an implementing data structure, which leads to a source code non-parallelizability.\newline\null
+\quad The data-centric parallelization problem is how to automatically recognise what kind of a data structure is used in the code: is it a tree, a linked-list or a directed acyclic graph. The DCP problem is not solved. Automatic methods are limited to relatively simple code bases such as libraries of well known data structures. The most successful methods rely on dynamic analysis of memory graphs. Static techniques such as shape analysis are undecidable and highly conservative and might not finish in a reasonable time for the real software projects. The next section gives a comprehensive literature review on the topic.
 \subsection{Literature Review}
 \label{background_dcp_literature_review}
 \quad The idea of automatic discovery of higher level entities in programs is not a new one. This discovery problem is closely interlinked and entangled with alias analysis techniques \cite{Muchnick:1998:ACD:286076} like points-to analysis \cite{Emami:1994:CIP:178243.178264}. Points-to analysis is a variation on data flow analysis techniques. The final output is the sets of pairs of the form (\textit{p},\textit{x}) (pointer variable \textit{p} points to a stack allocated variable \textit{x}). These techniques are aimed at getting aliasing information regarding stack-allocated pointers.\newline\null
