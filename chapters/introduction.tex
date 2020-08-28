@@ -1,11 +1,85 @@
 \chapter{Introduction}
+\label{introduction}
+
+\section{Overview}
+\label{introduction_overview}
+
+% The importance of software parallelization
+\quad Parallelism has become pervasive in the world of computing. Parallel hardware is omnipresent across the whole spectrum of various computing systems from low-end embedded processors to high-end supercomputers. Yet, most of the existing software is written in a sequential fashion: be it an old legacy software initially designed to run on the available at that time serial hardware or modern applications being developed by application domain experts rather than performance engineers. In order to exploit all available hardware facilities software has to be parallelized.\newline\null
+
+% The challenges of software parallelization
+\quad The task of \textbf{software parallelization} is multifaceted, extremely complex and has characteristically been a very manual process, which is time consuming and error-prone.
+
+An embarrassingly parallel problem might end up being hidden behind a thoughtless software design, a serial algorithm or being implemented with an unsuccessfully chosen lover level constructs, such as pointers, heap-allocated and pointer-linked data structures, indirect array referencing, etc. As legacy source code bases have been designed primarily for serial machines, they are rich with all these sub-optimal from the angle of software parallelization programming decisions.
+
+All that stresses the importance of alternative to the manual parallelization approaches.
+
+
+
+
+Despite decades of research into various alternative to manual software parallelization methods, the latter still face a number of challenges and do not deliver an expert level parallel perormance. 
+
+automatic parallelization techniques 
+
+% machine learning based methods are limited
+
+There has been a massive research into utilizing exotic to the field machine learning based methods. Although these methods have proved to be extremely useful and high performing on some compilation technology problems like selecting the best compiler flags or finding the most optimal compiler optimization parameters (like loop unroll or function inline factors). Due to the inherent statistical errors and unavailability of large training data sets these methods have not yet found a widespread application in the area of software parallelization. 
 
 
 
 
 
-\quad In the modern world parallel hardware has become ubiquitous through the entire spectrum of computing systems from low-end embedded devices to high-end supercomputers. Yet and still, most of the existing software is written in a sequential fashion: be it an old legacy software initially designed to run on the available at that time serial hardware or modern applications being developed by application domain experts rather than performance engineers. In order to exploit all available hardware facilities software has to be parallelized.\newline\null
-\quad The problem of software parallelization is multifaceted and requires of programmers to possess an additional (apart from their application domain expertise) knowledge in various domains of parallel programming (from cache coherence protocols to high level algorithmic skeletons). The task of software parallelization is a challenging one. Done in the wrong way software parallelization can even slow the program down in comparison to its original sequential version. For decades researches and engineers have been working on alleviating the challenging task of software parallelization. One of these work directions is automatic parallelization techniques, which are supposed to ultimately liberate programmers from the challenging task of manual parallelization. But, despite the massive body of work on the subject, automatic techniques still cannot deliver performance levels expert programmers reach and are limited to narrow domains of scientific Fortran codes and relatively simple computational idioms.\newline\null
+To elegantly and effectively map a parallel problem onto the exact hardware a programmer must possess an expert-level knowledge in the range of various fields from software design and algorithmic patterns down to automatic vectorization and cache coherence. We do not strive to find a "silver bullet" and solve the task of automatic parallelization. Neither do we expect an average programmer to be an expert. Instead, we acknowledge the role a programmer plays in the parallelization process and equip the former with an \textit{assistant solution}. Our solution alleviates the task and makes it more accessible for an average programmer.\newline\null
+
+ To take advantage of all the hardware capabilities available software has to be parallel as well.
+
+
+\quad The assistant solution consists of a tool and a library aiming at different stages of software parallelization. The library implements the novel notion of \textit{computational frameworks}. The latter help a programmer with a coarse-grained parallelization tasks, such as software design, algorithm and data structure choice. The library provides a user with a well-designed, modern and convenient interface. We prototyped the library on the suite of Olden benchmarks. The parallel library version is consistently outperforming the sequential version hitting 5-6x speedups on the major benchmarks.\newline\null
+\quad The tool aims at finer levels of granularity. Program loops are often the richest source of parallelism and account for the biggest portion of the running time. The tool identifies those loops, which are both worthwhile and feasible to parallelize. For each loop the tool combines its potential contribution to speedup and an estimated probability for its successful parallelization. This probability is predicted using a machine learning model, which has been trained and tested on 1415 labelled loops, achieving a prediction accuracy greater than 90\%. We present a methodology which makes a better use of an expert time by guiding them directly towards those loops, where the largest performance gains can be expected while keeping analysis and transformation effort at a minimum. We have evaluated our parallelization assistant against sequential C applications from the SNU NAS benchmark suite. We show that our novel methodology achieves parallel performance levels comparable to those from expert programmers while requiring less expert time. On average, our assistant reduces the number of lines of code that have to be inspected manually before reaching expert-level parallel speedup by 20\%.
+
+
+
+
+
+
+\section{Loop parallelization assistant}
+\label{introduction_assistant}
+\subsection{Contributions}
+\quad In summary, the project of our machine learning based loop parallelization assistant makes the following contributions:
+%
+\begin{itemize}
+\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemii{$\bullet$}
+\item We introduce a machine learning model, which can be used to predict the probability with which sequential C loops can be parallelized (Sections~\ref{predicting_parallel_loops} and~\ref{ml_predictive_performance});
+\item we integrate profiling of execution time with our novel ML model into a parallelization assistant, which guides the user through a ranked list of loops for parallelization (Section~\ref{practical_applications}); and
+\item we demonstrate that our tool and methodology increase programmer productivity by identifying parallel loop candidates better than existing state-of-the-art approaches (Section~\ref{evaluation}).
+\end{itemize}
+
+
+
+
+
+\section{Computational frameworks library}
+
+
+
+\label{introduction_frameworks}
+
+
+
+\subsection{Contributions}
+\begin{itemize}
+\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemii{$\bullet$}
+\item We introduce a machine learning model, which can be used to predict the probability with which sequential C loops can be parallelized (Sections~\ref{predicting_parallel_loops} and~\ref{ml_predictive_performance});
+\item we integrate profiling of execution time with our novel ML model into a parallelization assistant, which guides the user through a ranked list of loops for parallelization (Section~\ref{practical_applications}); and
+\item we demonstrate that our tool and methodology increase programmer productivity by identifying parallel loop candidates better than existing state-of-the-art approaches (Section~\ref{evaluation}).
+\end{itemize}
+
+Done in the wrong way software parallelization can even slow the program down in comparison to its original sequential version. 
+ 
+ For decades researches and engineers have been working on alleviating the challenging task of software parallelization. One of these work directions is automatic parallelization techniques, which are supposed to ultimately liberate programmers from the challenging task of manual parallelization. But, despite the massive body of work on the subject, automatic techniques still cannot deliver performance levels expert programmers reach and are limited to narrow domains of scientific Fortran codes and relatively simple computational idioms.\newline\null
+ 
 \quad Given the difficulty of the obstacles faced by automatic parallelisation today, we do not expect a breakthrough in the area or a "silver bullet" solving the problem in the near future. We acknowledge the role of a human expert, but at the same time we propose an assistant solution, which can be used to guide programmer's efforts and alleviate the manual parallelisation task.\newline\null
 \quad The assistant solution we propose is as multifaceted as the problem itself and consists of several components aimed to tackle different aspects of software parallelisability. It is a toolkit rather than a single tool. The first tool in the toolkit has been designed, developed and assessed during the first year of my PhD. Complementary tools are supposed to be developed over the course of remaining time.\newline\null
 \quad The designed tool is basically a machine learning (ML) based model of loop parallelisability integrated and utilised into an assistant scheme. Assistant takes an application to be parallelised along with its profile as an input and presents a programmer with a ranking of application loops. In contrast to a profile guided approach, assistant's ranking highlights application loops, which are not only long-running (and thus potentially profitable), but crucially parallelisable. This way a programmer concentrates his efforts on promising application loops and converges to the best achievable performance faster. We have deployed our assistant on SNU NAS Parallel Benchmarks \cite{snu-npb-benchmarks} \cite{nasa-parallel-benchmarks} and demonstrated a potential of our idea \cite{aiseps}.\newline\null
@@ -14,13 +88,8 @@
 
 
 
-% parallel hardware is ubiquitous, but software is sequential
 
-\quad Parallel hardware has become ubiquitous through the entire spectrum of computing systems, from low-end embedded devices to high-end supercomputers. Yet, most of the existing software is written in a sequential fashion. In order to exploit all available hardware facilities software has to be parallelized.
 
-% software parallelization is a complex and multifaceted topic 
-
-\quad The task of \textbf{software parallelization} is multifaceted and complex. A perfectly decomposable and parallelizable problem might end up being implemented with an unsuccessfully chosen non-parallelizable algorithm. And the algorithm in its turn might end up being implemented with an unsuccessfully chosen lower level constructions such as pointers, heap-allocated and pointer-linked data structures, indirect array referencing, etc. Legacy source code bases have been designed primarily for serial machines and are rich with all these sub-optimal from the angle of software parallelization programming decisions.
 
 % a knowledge programmers should possess 
 
