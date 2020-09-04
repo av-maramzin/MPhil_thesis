@@ -3,10 +3,45 @@
 
 \section{Introduction}
 \label{frameworks_introduction}
-% history: SPEC CPU2006 complexity and Olden benchmarks 
-% solution: computational frameworks library
-% solution: computational frameworks library
-% solution: computational frameworks library
+\quad The problem of software parallelization is multifaceted. In order to arrive at the final solution a programmer has to work on multiple conceptual levels starting from problem decomposition and algorithm choice down to software architecture design, data structure choice and finer grained low level loop optimizations. Our solution reduces the programmer's efforts along this curved and iterative path. If our loop parallelization assistant aims at reducing programmer's efforts at the finest granularity level, the library of computational frameworks alleviates the tasks of 
+
+software architecture design, as well as algorithm and data structure choice. The central motivating ground for the concept of computational frameworks and the prototype library we propose is formed by the data-centric parallelization (DCP) problem, limitations of the background work tackling the problem and the properties of the real world legacy code.
+\begin{description}[style=unboxed,leftmargin=0cm]
+\itemsep0em
+\item[Data-centric parallelization problem] Among all lower level implementation questions, the problem of successful data structure choice stands particularly prominent and important. Listings \ref{lst:introduction_array} and \ref{lst:introduction_list} illustrate how easily the parallelization can be hampered.\newline\null
+\begin{minipage}[t]{0.45\linewidth}
+\begin{lstlisting}[caption={Parallelisable loop operating on a \textbf{linear array}.},label={lst:introduction_array},language=C]
+for (int i=0; i<n; it++) {
+  a[i]=a[i]+1;
+}
+\end{lstlisting}
+\end{minipage}
+%
+\begin{minipage}[t]{0.5\linewidth}
+\begin{lstlisting}[caption={Non-parallelisable loop operating on a \textbf{linked-list}.},label={lst:introduction_list},language=C]
+for (p=list; p!=NULL; p=p->next) {
+  p->value+=1;
+}
+\end{lstlisting}
+\end{minipage}
+
+If a programmer had a tool, that could automatically recognize the type and properties of data structures and even automatically substitute them with a simpler, parallelizable and more suitable alternative data structure, it would make the parallelization process a lot easier. Unfortunately, as our background research discovered the solution to the problem is not available yet. There are a lot of various techniques and methodologies, but they all have their limitations and problems.
+\item[Background work] The idea of discovery of higher level entities in programs is definitely not a novel one. Shape analysis is one of the most well-known techniques, which aims at understanding of various heap-allocated data structures and their properties at compile time \cite{Sagiv:1999:PSA:292540.292552},\cite{Wilhelm:2000:SA:647476.760384}, \cite{Ghiya:1996:TDC:237721.237724}). These techniques maintain a various mathematical models and are based on the abstract interpretation of program statements, which update the model and finally lead to an approximation of the sought problem answer (node reachability, data structure cyclicity, disjointedness, etc.). \textit{Shape analysis techniques give a rough and conservative approximation (a \textit{Tree} (be it a binary tree or a linked-list) and work with high error rates (\textit{DAGs} vs. \textit{Cycles}), as well as are provably undecidable.} One of the more recent techniques is based on the pattern matching on the code intermediate representation (IR) level. The main idea is to specify computational idioms (such as reductions, stencils, sparse and dense linear algebra computations, etc.) to be recognized in a domain specific constraint based programming language CAnDL \cite{Ginsbach:2018:CDS:3178372.3179515},\cite{Ginsbach:2017:DEG:3049832.3049862}, \cite{Ginsbach:2018:AML:3296957.3173182},\cite{Ginsbach:2018:AML:3296957.3173182}. \textit{The CAnDL language allows for a rapid prototyping of new compiler optimisations based on pattern recognition and its substitution with an optimised versions of matched idioms, but it is limited for a relatively simple computational idioms and entities.} 
+\quad All the above methods are static and limited in their program view to a single compilation unit. The task of recognizing data structures is a grand challenge requiring a much broader view. Of all the available techniques only dynamic analysis techniques can come the closest to the solution of the DCP problem. There are numerous works available \cite{Rupprecht:2017:DID:3155562.3155607}\cite{Haller:2016:SDS:2938006.2938029}, \cite{Haller:2016:SDS:2938006.2938029}, \cite{Rupprecht:2017:DID:3155562.3155607}. These techniques are based on program instrumentation and construction of various dynamic memory allocation graphs. The idea is that these graphs along with their update operations can reflect the actual shape of the data structure. Probably the most promising and the best performing of all is the work of a Data-structure Detection Tool (DDT) \cite{1669122}. The technique has been deployed to recognise data structure implementations withing standard libraries like STL, Apache (STDCXX), Borland (STLport), GLib, Trimaran achieving almost perfect recognition accuracy. Moreover, the technique has been able to recognise linked lists in Em3d and Bh Olden benchmarks, along with red-black trees implementing vectors in Xalancbmk benchmark. But it is still far from an automatic data structure technique, that could be used in a production quality compiler and tackling a wide set of various benchmakrs and programs.
+\item[Real world code complexity level] The simple motivating example behind the DCP problem is obviously far below the complexity level of the real world code. The work with data structure can be spread all around the code base: allocation and initialization happens in one translation unit, update operations on the data structure are scattered between various functions in multiple other translation units. The exact way an operation works determines the properties (cyclicity, reachability, etc.) of a data structure and untimately its type. It is crucial to understand how an algorithm actually calls data structure update operations. \textit{Thus, all that leads to the inseparability of algorithms and data structures: understanding the data structure type might require the understanding of the algorithm and vise versa. If one aims at data structure substitution, one might need to transform the algorithm as well.} Indeed, as our feasibility studies of SPEC CPU2006 benchmark suite have shown let alone automatic techniques, it might take some weeks even for an experienced human software engineer to understand what kind of data structures a benchmark uses and how to optimize it.
+\end{description}
+\quad The task of separating data structures and algorithms seems infeasible. Moreover, for some applications and benchmarks it does not seem meaningful either. For example, the suite of Olden benchmarks is much simpler, than SPEC CPU2006, but also confirms the fact of inseparability. For many of Olden benchmarks the data structures and algorithms form the union, but we can parallelize and rewrite the suite with a higher level entities, which embody both data structures and algorithms. In our project we propose the novel notion of \textit{computational frameworks}. The latter help a programmer with a coarse-grained parallelization tasks, such as software design, algorithm and data structure choice. We provide a prototype off-the-shelf C++ template library implementing the notion. The latter are ready to use parallelism patterns. A programmer only needs to customize his computation through an LLVM-like interface. We prototyped the library on the suite of Olden benchmarks. The parallel library version is consistently outperforming the sequential version hitting 5-6x speedups on the major benchmarks.\newline\null
+\subsection{Contributions}
+\begin{itemize}[style=unboxed,leftmargin=0cm]
+\itemsep0em
+\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemii{$\bullet$}
+\item We propose a novel notion of \textit{computational frameworks}, which are higher level entities that embody both the data structures and the algorithms; and
+\item ship a prototype C++ template library implementing the notion in a modern, convenient, parallel and an easy to use way;
+\item We have turned the suite of Olden benchmarks written in the legacy C style into a modern C++ and parallel OpenMP implementation based on our computational frameworks; and
+\item demonstrate the potential of the notion and the performance of the library on the suite of Olden benchmarks (Sections~\ref{frameworks_performance_study} ), achieving consistent parallel speedups of 5-6x on the major benchmarks;
+\item At last, we propose an alternative software parallelization scheme based on the library as a future work.
+\end{itemize}
 
 
 
@@ -60,7 +95,7 @@ sequential program a programmer can work with its instructions directly by
 
 \subsection{Motivating example}
 \label{frameworks_motivating_example}
-\quad Let's consider a motivating example highlighting the essence of the idea of computational frameworks. Suppose we want to calculate a \textit{left fold} updating its elements with corresponding folded values.\newline\null
+\quad Let's consider a motivating example presenting  highlighting the essence of the idea of computational frameworks. Suppose we want to calculate a \textit{left fold} updating its elements with corresponding folded values.\newline\null
 \quad We can code that simple computation using C++ Standard Template Library (STL). Listing \ref{lst:left_fold_list} shows the code implementing the task with a list class template. First, we construct a list with 5 elements and initialize them. Then we loop through the list updating its elements and return the final left folded value. The task is small and the code is concise, but it is still possible to see its drawbacks. The code does not clearly separate concerns: list traversal, result computation and transformation of list elements are all mixed up together. For a better structuredness it would make sense to put these different pieces of functionality into separate places. Alternatively, we could use STL's std::accumulate() function template. The latter provides a programmer with a more concise and abstract interface, but does not allow any side effects. We would still need to write a separate chunk of code aimed at an update of list elements.\newline\null 
 \quad In our project we propose an idea of computational frameworks. Listing \ref{lst:left_fold_framework} shows an alternative implementation of left fold using our Fold computational framework. In order to use it a programmer has to be familiar with the concept of functional fold. The underlying implementation of the fold logic is a list traversal, which forms the backbone of the computation and is hidden behind the user interface our framework provides. 
 
