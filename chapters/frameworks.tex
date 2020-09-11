@@ -3,34 +3,30 @@
 
 \section{Introduction}
 \label{frameworks_introduction}
-\quad The problem of software parallelization is multifaceted. In order to arrive at the final solution a programmer has to work on multiple conceptual levels starting from problem decomposition and algorithm choice down to software architecture design, data structure choice and finer grained low level loop optimizations. Our solution reduces the programmer's efforts along this curved and iterative path. If our loop parallelization assistant aims at reducing programmer's efforts at the finest granularity level, the library of computational frameworks alleviates the tasks of 
-
-software architecture design, as well as algorithm and data structure choice. The central motivating ground for the concept of computational frameworks and the prototype library we propose is formed by the data-centric parallelization (DCP) problem, limitations of the background work tackling the problem and the properties of the real world legacy code.
+\quad The problem of software parallelization is multifaceted. In order to arrive at the final solution a programmer has to work on multiple conceptual levels. The process of parallel software development starts on the high level of problem decomposition and algorithm choice along with choosing all supporting data structures. These tasks imply organization of communications and synchronization (if necessary) between parallel problem parts and require of programmer to possess a high level of algorithmic skills. When that is done a programmer starts implementation, which requires awareness of the lower level hardware specific optimizations. As program loops are particularly important on that level, this lower level work is addressed with our machine learning based loop parallelization assistant, which we described in the previous chapter \ref{assistant}. In this chapter though we describe our work on the notion of \textit{computational frameworks}, which is supposed to alleviate higher level and coarser grained parallelization tasks, as well as back it up with a prototype library implemention the notion. A programmer only needs to customize his computation through a modern and a well-defined interface.\newline\null
+\quad Computational frameworks \textbf{reduce the programmer's efforts} along the following lines:
+\begin{itemize}[style=unboxed,leftmargin=0cm]
+\itemsep0em
+\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemii{$\bullet$}
+\item \textbf{Software architecture design}. We provide a ready to use library of computational frameworks. The design of our library has been inspired by the style of the LLVM Pass Framework. In addition to that, we take the best ideas of software design patterns. So, using our library a programmer is partly relieved of a high level software architecture design task. Meanwhile, a programmer might be assured that the final piece of software is going to be modern, well-structured and efficient.   
+\item \textbf{Algorithm choice}. A parallelization hidden behind an LLVM-like interface of functional algorithmic patterns. Functional programming constructs (fold, map, reduce, etc.) are quite common, parallelizable, well-known and are good candidates for parallelization.
+\item \textbf{Data structure choice}. \item \textbf{Parallelization}.
+\end{itemize}
+Given the high level of effort involved in manual parallelization, such a reduction can translate into substantial development cost savings.\newline\null
+\quad To demonstrate the utility of the notion as well as its potential, we deploy our library on the subset of Olden benchmarks. We rewrite the original legacy C versions of the benchmarks in a modern, better structured and crucially parallel way with the help of our computational frameworks. The parallel library version is consistently outperforming the sequential version hitting 5-6x speedups on the major benchmarks.
+\begin{center}
+\textbf{\large \textit{The motivating ground}}
+\end{center}
+\quad The introductory chapter \ref{introduction} has already outlined and highlighted the major problems of the field that motivate the project of computational frameworks. Among them:
 \begin{description}[style=unboxed,leftmargin=0cm]
 \itemsep0em
-\item[Data-centric parallelization problem] Among all lower level implementation questions, the problem of successful data structure choice stands particularly prominent and important. Listings \ref{lst:introduction_array} and \ref{lst:introduction_list} illustrate how easily the parallelization can be hampered.\newline\null
-\begin{minipage}[t]{0.45\linewidth}
-\begin{lstlisting}[caption={Parallelisable loop operating on a \textbf{linear array}.},label={lst:introduction_array},language=C]
-for (int i=0; i<n; it++) {
-  a[i]=a[i]+1;
-}
-\end{lstlisting}
-\end{minipage}
-%
-\begin{minipage}[t]{0.5\linewidth}
-\begin{lstlisting}[caption={Non-parallelisable loop operating on a \textbf{linked-list}.},label={lst:introduction_list},language=C]
-for (p=list; p!=NULL; p=p->next) {
-  p->value+=1;
-}
-\end{lstlisting}
-\end{minipage}
-
-If a programmer had a tool, that could automatically recognize the type and properties of data structures and even automatically substitute them with a simpler, parallelizable and more suitable alternative data structure, it would make the parallelization process a lot easier. Unfortunately, as our background research discovered the solution to the problem is not available yet. There are a lot of various techniques and methodologies, but they all have their limitations and problems.
-\item[Background work] The idea of discovery of higher level entities in programs is definitely not a novel one. Shape analysis is one of the most well-known techniques, which aims at understanding of various heap-allocated data structures and their properties at compile time \cite{Sagiv:1999:PSA:292540.292552},\cite{Wilhelm:2000:SA:647476.760384}, \cite{Ghiya:1996:TDC:237721.237724}). These techniques maintain a various mathematical models and are based on the abstract interpretation of program statements, which update the model and finally lead to an approximation of the sought problem answer (node reachability, data structure cyclicity, disjointedness, etc.). \textit{Shape analysis techniques give a rough and conservative approximation (a \textit{Tree} (be it a binary tree or a linked-list) and work with high error rates (\textit{DAGs} vs. \textit{Cycles}), as well as are provably undecidable.} One of the more recent techniques is based on the pattern matching on the code intermediate representation (IR) level. The main idea is to specify computational idioms (such as reductions, stencils, sparse and dense linear algebra computations, etc.) to be recognized in a domain specific constraint based programming language CAnDL \cite{Ginsbach:2018:CDS:3178372.3179515},\cite{Ginsbach:2017:DEG:3049832.3049862}, \cite{Ginsbach:2018:AML:3296957.3173182},\cite{Ginsbach:2018:AML:3296957.3173182}. \textit{The CAnDL language allows for a rapid prototyping of new compiler optimisations based on pattern recognition and its substitution with an optimised versions of matched idioms, but it is limited for a relatively simple computational idioms and entities.} 
-\quad All the above methods are static and limited in their program view to a single compilation unit. The task of recognizing data structures is a grand challenge requiring a much broader view. Of all the available techniques only dynamic analysis techniques can come the closest to the solution of the DCP problem. There are numerous works available \cite{Rupprecht:2017:DID:3155562.3155607}\cite{Haller:2016:SDS:2938006.2938029}, \cite{Haller:2016:SDS:2938006.2938029}, \cite{Rupprecht:2017:DID:3155562.3155607}. These techniques are based on program instrumentation and construction of various dynamic memory allocation graphs. The idea is that these graphs along with their update operations can reflect the actual shape of the data structure. Probably the most promising and the best performing of all is the work of a Data-structure Detection Tool (DDT) \cite{1669122}. The technique has been deployed to recognise data structure implementations withing standard libraries like STL, Apache (STDCXX), Borland (STLport), GLib, Trimaran achieving almost perfect recognition accuracy. Moreover, the technique has been able to recognise linked lists in Em3d and Bh Olden benchmarks, along with red-black trees implementing vectors in Xalancbmk benchmark. But it is still far from an automatic data structure technique, that could be used in a production quality compiler and tackling a wide set of various benchmakrs and programs.
-\item[Real world code complexity level] The simple motivating example behind the DCP problem is obviously far below the complexity level of the real world code. The work with data structure can be spread all around the code base: allocation and initialization happens in one translation unit, update operations on the data structure are scattered between various functions in multiple other translation units. The exact way an operation works determines the properties (cyclicity, reachability, etc.) of a data structure and untimately its type. It is crucial to understand how an algorithm actually calls data structure update operations. \textit{Thus, all that leads to the inseparability of algorithms and data structures: understanding the data structure type might require the understanding of the algorithm and vise versa. If one aims at data structure substitution, one might need to transform the algorithm as well.} Indeed, as our feasibility studies of SPEC CPU2006 benchmark suite have shown let alone automatic techniques, it might take some weeks even for an experienced human software engineer to understand what kind of data structures a benchmark uses and how to optimize it.
+\item[\textit{Data-centric parallelization (DCP) problem}] The problem of successful data structure choice stands particularly prominent and important. A wrong choice can break parallelization and an optimal one requires some programmer expertise and understanding. A tool, that could automatically recognize the type and properties of data structures and even automatically substitute them with a simpler, parallelizable and more suitable alternative data structures would make the parallelization process a lot easier, but it is not available at the moment due to a number of limitations.  
+\item[\textit{Limitations of "The state of the art" work}] Static shape analysis techniques \cite{Sagiv:1999:PSA:292540.292552},\cite{Wilhelm:2000:SA:647476.760384}, \cite{Ghiya:1996:TDC:237721.237724}
+give a very rough and conservative approximation (a \textit{Tree} (be it a binary tree or a linked-list), work with high error rates (\textit{DAGs} vs. \textit{Cycles}) and are provably undecidable. More recent pattern matching techniques \cite{Ginsbach:2018:CDS:3178372.3179515},\cite{Ginsbach:2017:DEG:3049832.3049862}, \cite{Ginsbach:2018:AML:3296957.3173182},\cite{Ginsbach:2018:AML:3296957.3173182} are limited to a relatively simple computational idioms and entities. Moreover, all static techniques are limited in their program view to a single compilation unit. The grand challenge of data structure recognition requires a much broader view. Dynamic techniques \cite{Rupprecht:2017:DID:3155562.3155607}\cite{Haller:2016:SDS:2938006.2938029}, \cite{Haller:2016:SDS:2938006.2938029}, \cite{Rupprecht:2017:DID:3155562.3155607}, \cite{1669122} come the closest to the solution of the DCP problem, but are still far from solving this grand problem for an arbitrary code. The arbitrary code might require not just a data structure comprehension, but an algorithms as well. 
+\item[\textit{Data structure and algorithm inseparability}] Understanding the data structure type might require understanding of the algorithm and vise versa; and the data structure substitution might lead to algorithm transformation. The task of separating data structures from algorithms seems infeasible. Moreover, for some applications and benchmarks it does not seem meaningful either. For example, the suite of Olden benchmarks is much simpler, than SPEC CPU2006, but also suffers from the same inseparability problem. For many of Olden benchmarks the data structures and algorithms are blended together, but the union they form can be framed into an elegant higher level entity of computational frameworks, that can later be parallelized in a nice and structured way.
+\item[\textit{The ever-going trend to higher abstraction levels}] For decades there has been an ongoing trend in the process of software engineering to move up in the levels of abstraction from a bare hardware to a higher level concepts closer to a human reasoning and understanding. Computational frameworks move from the level of algorithms and data structures to a new level of higher concepts.
 \end{description}
-\quad The task of separating data structures and algorithms seems infeasible. Moreover, for some applications and benchmarks it does not seem meaningful either. For example, the suite of Olden benchmarks is much simpler, than SPEC CPU2006, but also confirms the fact of inseparability. For many of Olden benchmarks the data structures and algorithms form the union, but we can parallelize and rewrite the suite with a higher level entities, which embody both data structures and algorithms. In our project we propose the novel notion of \textit{computational frameworks}. The latter help a programmer with a coarse-grained parallelization tasks, such as software design, algorithm and data structure choice. We provide a prototype off-the-shelf C++ template library implementing the notion. The latter are ready to use parallelism patterns. A programmer only needs to customize his computation through an LLVM-like interface. We prototyped the library on the suite of Olden benchmarks. The parallel library version is consistently outperforming the sequential version hitting 5-6x speedups on the major benchmarks.\newline\null
 \subsection{Contributions}
 \begin{itemize}[style=unboxed,leftmargin=0cm]
 \itemsep0em
@@ -40,68 +36,23 @@ If a programmer had a tool, that could automatically recognize the type and prop
 \item ship a prototype C++ template library implementing the notion in a modern, convenient, parallel and an easy to use way;
 \item We have turned the suite of Olden benchmarks written in the legacy C style into a modern C++ and parallel OpenMP implementation based on our computational frameworks; and
 \item demonstrate the potential of the notion and the performance of the library on the suite of Olden benchmarks (Sections~\ref{frameworks_performance_study} ), achieving consistent parallel speedups of 5-6x on the major benchmarks;
-\item At last, we propose an alternative software parallelization scheme based on the library as a future work.
+\item At last, we propose an idea of alternative software parallelization approach based on the library as a future work.
 \end{itemize}
 
-
-
-
-% problem: manual parallelization is hard, a need for a more user friendly higher level construct
-
-\quad The task of manual software parallelization is multifaceted. 
-
-To fully exploit the potential of modern multi- and many-core hardware still requires a significant manual effort.
-
-% solution: computational frameworks library
-
-\quad The programmer starts on the high level of problem domain and algorithm. The task is to find independent parts in the problem to be solved in parallel. If there are dependencies among them, then the programmer has to design a synchronization mechanism. In our solution package we propose an off-the-shelf C++ template library of computational frameworks. The latter are ready to use parallelism patterns. A programmer only needs to customize his computation through an LLVM-like interface.
-
-This chapter introduces a novel parallelization assistant that aids a programmer in the process of parallelizing a program in the frequent case where automatic approaches fail to do so.
-%
-The assistant reduces the manual effort in this process by presenting a programmer with a ranking of program loops that are most likely to 1) require little or no effort for successful parallelization and 2) improve the program's performance when parallelized.
-%
-Thus, it improves over the traditional, profile-guided process by also taking into account the \emph{probability} of potential parallelization for each of the profiled loops.
-
-% how?
-
-A parallelization hidden behind an LLVM-like interface of functional algorithmic patterns. 
-%
-Functional programming constructs (fold, map, reduce, etc.) are quite common, parallelizable, well-known and are good candidates for parallelization.
-
-We applied the library to a set of Olden benchmarks.
-
-%
-Given the high level of effort involved in manual parallelization, such a reduction can translate into substantial development cost savings.
-
-% The trend of moving to a higher abstraction levels in software engineering
-
-\quad For decades there has been an ongoing trend in the process of software engineering to move up in the levels of abstraction from a bare hardware to a higher level concepts closer to a human reasoning and understanding.\newline\null
-\quad A move from assembly languages to languages like Fortran and C increased productivity of programmers by supporting structuredness and modularity and offloading many routine and tedious tasks onto a compilation software. The development of object-oriented languages neared the process of software design to a human level object based construction. All these languages are based on imperative programming principles, which revolve around the notion of the state. Language statements leave side effects and updates to the state. The latter is passed around in order to achieve the final goal. A more recent trend though is a move from imperative programming paradigm to a functional. Functional languages specify the final requirement to be computed, but do not specify the exact sequence of statements   
-
-
-C and Fortran were high-level languages of that time, but still a low-level languages for today's standards. These languages support an imperative programming paradigm. The main characteristic of that is the concept of state. The statements of the language read and update the state. Procedures pass the state and results around achieving the final goal of the program.   
-
-\quad The trend of moving from low to higher abstraction levels is not only true for software engineering in general, but for parallel software engineering in particular. Modern hardware provides a diverse and vast support for different forms of parallelism: pipelined CPUs with out-of-order and superscalar instruction execution, vector extensions of modern CPU instruction sets, multi-core processors running as part of multi-processor system, etc. Given a sequential program a programmer can work at the finest level of granularity by choosing vector instructions over scalar ones and changing their relative order trying to minimise the number of pipeline stalls and memory waits. To exploit a coarse-grain parallelism a programmer can rewrite a program in a multi-threaded fashion. Here a programmer may choose to work with the operating system interface like POSIX threads or use some 
-
-abstract parallel machine models   
-
-level by rewriting program instructions by preferring vector ones to a scalar or change their relative order trying to minimise the number of pipeline stalls    
-
-in modern computing systems a programmer may 
-
-sequential program a programmer can work with its instructions directly by 
-
-\quad In this chapter we propose an idea of \textbf{computational frameworks}. Computational frameworks are a higher level entities, which embody the principles of both imperative and functional programming styles. Computational frameworks make certain programming tasks easier to address. These tasks can be outlined by the properties 
+\subsection{Limitations and Future work}
+\begin{itemize}[style=unboxed,leftmargin=0cm]
+\itemsep0em
+\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemii{$\bullet$}
+\item For limitations of the concept and the library see section \ref{frameworks_limitations}.
+\end{itemize}
+\quad This chapter is structured in the following way. The next section \ref{frameworks_motivating_example} gives a quick how-to-use and an initial feel example. Section describes all the frameworks we have implemented in our library
 
 \subsection{Motivating example}
 \label{frameworks_motivating_example}
-\quad Let's consider a motivating example presenting  highlighting the essence of the idea of computational frameworks. Suppose we want to calculate a \textit{left fold} updating its elements with corresponding folded values.\newline\null
-\quad We can code that simple computation using C++ Standard Template Library (STL). Listing \ref{lst:left_fold_list} shows the code implementing the task with a list class template. First, we construct a list with 5 elements and initialize them. Then we loop through the list updating its elements and return the final left folded value. The task is small and the code is concise, but it is still possible to see its drawbacks. The code does not clearly separate concerns: list traversal, result computation and transformation of list elements are all mixed up together. For a better structuredness it would make sense to put these different pieces of functionality into separate places. Alternatively, we could use STL's std::accumulate() function template. The latter provides a programmer with a more concise and abstract interface, but does not allow any side effects. We would still need to write a separate chunk of code aimed at an update of list elements.\newline\null 
-\quad In our project we propose an idea of computational frameworks. Listing \ref{lst:left_fold_framework} shows an alternative implementation of left fold using our Fold computational framework. In order to use it a programmer has to be familiar with the concept of functional fold. The underlying implementation of the fold logic is a list traversal, which forms the backbone of the computation and is hidden behind the user interface our framework provides. 
-
-The Fold uses standard C++ language facilities such as static and dynamic polymorphism and leans onto the compiler to do the major work. The user interafce resembles LLVM Pass Framework. A programmer has to use a curiously recurring template pattern.
-
-\quad Although the code in listing \ref{lst:left_fold_framework} feels heavy for such a simple computation and is certainly an overkill, but when a computational task is 
+\quad To get an initial feeling for what it is like to use our computational frameworks from a user perspective, let's consider a motivating example. The example also highlights the essential differences between the existent libraries and concepts and ours.\newline\null
+\quad Suppose we want to calculate a well-known functional programming concept of the \textit{left fold}, which also updates its elements with corresponding folded values, thus leaving some side effects. We can code that simple computation using C++ Standard Template Library (STL). Listing \ref{lst:left_fold_list} shows the code implementing the task with a list class template. First, we construct a list with 5 elements and initialize them to the value of 1. Then we loop through the list updating its elements and return the final left folded value. The task is small and the code is concise, but it is still possible to see its drawbacks. The code does not clearly separate concerns: list traversal, result computation and list transformation all happen in the same place and are mixed up together. For a better structuredness it would make sense to put these different pieces of functionality into separate places. Alternatively, we could use STL's std::accumulate() function template. The latter provides a programmer with a more concise and abstract interface, but does not allow any side effects. We would still need to write a separate chunk of code aimed at an update of the list elements.\newline\null 
+\quad In our project we propose an idea of computational frameworks. Listing \ref{lst:left_fold_framework} shows an alternative implementation of the left fold using our \textbf{Fold} computational framework. In order to use it a programmer has to be familiar with the concept of functional fold. The underlying implementation of the fold logic is a list traversal, which forms the backbone of the computation and is hidden behind the user interface our framework provides. The Fold uses standard C++ language facilities such as static and dynamic polymorphism and leans onto the compiler to do the major work. The user interafce resembles that of the LLVM Pass Framework. A programmer has to use a curiously recurring template pattern (CRTP) to inherit the set interface with its implementation. Although the code in listing \ref{lst:left_fold_framework} feels heavy for such a simple computation and is certainly an overkill, but when a computational task is significant our frameworks will do the job.
 
 %\begin{minipage}[t]{\linewidth}
 \begin{lstlisting}[caption={Left fold computation using standard STL list class template},label={lst:left_fold_list},language=C++]
@@ -158,20 +109,6 @@ int main() {
 }
 \end{lstlisting}
 %\end{minipage}
-
-\subsection{Contributions}
-\label{frameworks_contributions}
-\quad In summary, the project of computational frameworks makes the following contributions:
-%
-\begin{itemize}
-\renewcommand\labelitemi{$\vartriangleright$}
-\renewcommand\labelitemii{$\bullet$}
-\item We propose a novel idea of computational frameworks as a higher level construct assisting the process of parallel software engineering. The construct blends algorithms and data structures as well as represents both functional and imperative programming paradigms.
-\item We developed a prototype C++ class template library. The library provides a modern user interface inspired by The LLVM Pass Framework and is based on the modern C++ and OpenMP parallel implementation.
-\item We have rewritten Olden benchmarks to use our library. Original legacy C implementation has now been turned into the modern and well-structured C++ version with parallel and sequential options.
-\item We conducted a thorough study of benchmarks behaviour and the running time of the library. All benchmarks demonstrate significant speedups of several times with bigger workloads to the original legacy C sequential version.
-\item As a future work, we propose an alternative to existent software parallelization scheme.
-\end{itemize}
 
 \section{Computational Frameworks}
 \label{computational_frameworks_main}
@@ -277,141 +214,46 @@ class Framework {
 
 \section{Performance study of the library}
 \label{frameworks_performance_study}
-\quad We have conducted a thorough examination of our prototype library. For that purpose we used 4 Olden benchmarks. Benchmarks \textit{health}, \textit{treeadd} and \textit{perimeter} fit into our \textbf{fractal} framework and stress it from different angles. We used the \textit{power} benchmark to test the practical operation of our \textbf{fold} and \textbf{reduce} frameworks.\newline\null
-\quad We have rewritten original sequential legacy C implementations of the benchmarks with our prototype library in a modern, structured and well-designed way. The implementation can be configured to to be sequential or parallel. The fractal in the most general case is based on N-ary unbalanced tree.   
-
-
-of 4 Olden benchmarks: health, perimeter, treeadd and power. The table below shows the performance gains our versions have over old sequential implementations.   
+\quad We have conducted a thorough performance examination of our prototype library. For that purpose we used 4 Olden benchmarks we are interested in. Benchmarks \textit{health}, \textit{treeadd} and \textit{perimeter} fit into our \textbf{fractal} framework and stress it from different angles. We used the \textit{power} benchmark to test the practical operation of our \textbf{fold} and \textbf{reduce} frameworks. We have rewritten the original sequential legacy C implementations of the benchmarks with our prototype library in a modern, structured and well-designed way. Thus, rejuvenating the code and parallelizing it in a well-structured and systematic manner. On the opposite side, these benchmarks inspired the concept of computational frameworks and shaped the design of the library.\newline\null 
+\quad Performance plots below (figures \ref{fig:performance_health}, \ref{fig:performance_power_reduction_width}, \ref{fig:performance_treeadd}, \ref{fig:performance_perimeter}) show the strengths of the library, as well as its equally important weaknesses. The latter characterize applicability of the library, rather than the problems of the idea. In some places weaknesses highlight implementation problems, which are a matter of software engineering and not that of a research. The implementation can be easily configured to to be sequential or parallel, thus making it easy to conduct measurement experiments. Moreover, the fractal framework has 2 implementations under the hood. In the most general case the fractal is based on N-ary unbalanced tree. In this case we allocate it dynamically and every node has an array of pointers to its children. But in the case of a perfect (all leaves are at the same depth and every non-leaf node has all children present) tree, we can allocate all nodes linearly in an array-based heap manner. In the latter case parallelization happens per level, spawning the number of threads equal to the number of nodes at the given depth (provided that enough CPU cores are available). In the general case though we do not know where the growth of the fractal is going to stop and cannot index nodes on the array. Parallelization in the case of unbalanced fractal happens per child: spawning the number of threads equal to the number of children (again, provided that enough CPU cores are available). Figure \ref{fig:balanced_vs_unbalanced} illustrates two implementation strategies and performance plots below compare them.
+\begin{figure}[!htb]
+\includegraphics[width=1.0\textwidth]{images/balanced_vs_unbalanced.pdf}
+\caption{\textit{Balanced} vs. \textit{Unbalanced} implementations of the fractal framework. Unbalanced implementation handles arbitrary tree and thus is based on pointers. Balanced implementation optimizes the case of a perfect tree and can be implemented with an array.}
+\label{fig:balanced_vs_unbalanced}
+\end{figure}\newline\null
+\quad Figure \ref{fig:performance_health} demonstrates performance of various versions of the \textit{health} benchmark. The benchmark was described in section \ref{background_benchmarks_olden}. The benchmark grows a tree of hospitals and performs a simulation of the Columbian healthcare system step by step. The number of simulation steps done is plotted on the horizontal axis. The time a simulation took is plotted on a vertical axis. Nodes of the tree, which represent hospitals grow various lists of patients. As simulation goes the lists grow and the nodes become heavier. In other words, the state of the benchmark becomes bigger. The latter has an accumulating effect and contributes to the workload. We can see this phenomenon reflected in an exponential time growth of the sequential version. Parallel versions diminish this exponential time growth by tackling the task with several threads. This results into 5-6x speedups of the parallel versions relative to sequential ones. This benchmark is an ideal one to tackle with our fractal framework. And indeed, as figure \ref{fig:performance_health} shows, the thick lines representing the real time (wall clock time) indicate that a parallel version is consistently outperforming sequential version. The sequential versions of our library perform roughly as good as the original legacy C implementation (thin lines vs. a thick \textit{original} line). The latter shows that our library does not introduce any overheads on a benchmark with a significant workload.
+\begin{figure}[!htb]
+\includegraphics[width=1.0\textwidth]{images/health_depth_10.png}
+\caption{Library performance on the \textit{health} benchmark. The legacy C implementation is represented by a thick \textit{original} line. Implementations of the benchmark based on our library are represented by 2 thick (\textit{parallel balanced} and \textit{unbalanced}) and 2 thin (\textit{sequential balanced} and \textit{unbalanced}) lines. Dotted lines represent the CPU time, which is not the real time and has a secondary importance. CPU time reflects the computational workload as we throw several threads at a task and can be used to judge on parallelization aggressiveness.}
+\label{fig:performance_health}
+\end{figure}\newline\null
+\quad Figure \ref{fig:performance_power_reduction_width} illustrates the results for the \textit{power} benchmark. The benchmark performs a workload of scientific computations. The pattern is basically a reduction of folds of folds of reductions. So, the benchmark tests our \textbf{fold} and \textbf{reduce} frameworks. We can vary the width of reductions as well as the depth of folds to get various amounts of workload. The benchmark runs repeatedly until the computation result falls withing the set epsilon error. Figure \ref{fig:performance_power_reduction_width} illustrates how the running time of the benchmark scales with an increasing top level reduction width. The latter increases the workload and one can see the growing running time of the sequential original legacy C version. The sequential version based on our library runs roughly as good as the original one, while the parallel version is consistently outperforming both sequential versions. Dotted line again represents the CPU time and not the real time. CPU time approximately reflects how many threads were used to run the benchmark. As a validation, one can see that CPU time divided by parallel wall clock time is roughly corresponds to the reduction width. Behaviour of the \textit{power} benchmark is similar when we vary reduction widths or fold depths. For that reason we do not include the other experiments we ran.
+\begin{figure}[!htb]
+\includegraphics[width=1.0\textwidth]{images/power_reduction_width.png}
+\caption{Library performance on the \textit{power} benchmark. We vary the top level (feeders) reduction width to scale the workload.}
+\label{fig:performance_power_reduction_width}
+\end{figure}\newline\null
+\quad The \textit{health} and the \textit{power} benchmarks show the strengths of our library. The \textit{treeadd} and \textit{perimeter} benchmarks highlight its weaknesses. Figure \ref{fig:performance_treeadd} shows the behaviour of the \textit{treeadd} benchmark. This benchmark grows a tree with values at its nodes. Then it runs iteratively computing the reduction over the tree and updating node values. The computation is very lighweight and the state is minimal here. As we run the benchmark over and over the state does not grow. One can see a roughly linear running time of the original legacy C version. Overheads of our sequential library versions are striking for such a small benchmark, but again they can be optimized with a better engineered prototype library version and do not attribute to the research idea. The more threads we throw the bigger our overheads become. One can see it looking at the running time of balanced and unbalanced versions. It is worthless to tackle such a small benchmark with our library.      
+\begin{figure}[!htb]
+\includegraphics[width=1.0\textwidth]{images/treeadd_depth_16.png}
+\caption{Library performance on the \textit{treeadd} benchmark.}
+\label{fig:performance_treeadd}
+\end{figure}\newline\null
+\quad The \textit{perimeter} benchmark shows a different picture, but still highlights the current weaknesses of our prototype library implementation. Figure \ref{fig:performance_perimeter} shows the bar chart. As the benchmark is based on an unbalanced tree version we cannot run it with a balanced implementation. Here we have only the original sequential legacy C implementation, the sequential implementation based on our library and its parallel counterpart. One can see that the benchmark also highlights the current implementation problems: original does better than sequential. At the same time the benchmark has a potential: there is a good parallel speedup when we compare the sequential versus parallel library based versions. Although the library needs an optimization effort. Again, this is not the problem of an idea, but a mere software engineering task.
+\begin{figure}[!htb]
+\includegraphics[width=1.0\textwidth]{images/perimeter.png}
+\caption{Library performance on the \textit{perimeter} benchmark.}
+\label{fig:performance_perimeter}
+\end{figure}
 
 \section{Future work}
 \label{frameworks_future_work}
-\quad The concept of computational frameworks and the prototype library form the basis for the future work. We believe that the process of software parallelization with the help of computational frameworks can be further automated for a relatively simple applications (like Olden benchmarks). To back this feeling let's consider the health benchmark from the Olden suite. In particular, let's consider the grow() method, which allocates and grows the tree of villages.
-\quad Listing \ref{lst:future_work_original} shows the original \textit{alloc\_tree()} function. It takes an integer argument \textit{level}, which specifies the depth of the tree to grow, then it takes an integer seed \textit{label} to initialize the element and a pointer \textit{back} to link the parent node to its children. In the body of the function we allocate dynamic memory for the node using \textit{malloc} call and call the \textit{alloc\_tree} function recursively in a loop of 4 iterations. The function returns a pointer to the created child subtree and the loop at the bottom of procedure links these pointers to a newly allocated and initialized node. For the initialization we calculate the number of personnel in a hospital and prepare the various lists of patients (waiting, inside, assessment, returned, etc.).\newline\null
-
-\begin{minipage}[t]{\linewidth}
-\begin{lstlisting}[caption={Computational framework class template skeleton},label={lst:future_work_original},language=C]
-
-struct Village* alloc_tree(int level, int label, struct Village* back) {
-    
-    if (level == 0) {
-        return NULL;
-    } else {
-        struct Village* new;
-        int i;
-        struct Village* fval[4];
-
-        new = (struct Village*) malloc(sizeof(struct Village));
-
-        for (i = 3; i >= 0; i--)
-            fval[i] = alloc_tree(level-1, label*4+i+1, new, i);
-
-        new->back = back;
-        new->seed = label * (IQ + seed); 
-        new->hosp.personnel = (int)pow(2, level - 1);
-        new->hosp.assess.forward = NULL;
-        new->hosp.assess.back = NULL;
-        new->hosp.assess.patient = NULL;
-        new->hosp.waiting.forward = NULL;
-        ...
-        new->returned.patient = NULL;
-
-        for (i = 0; i < 4; i++)
-            new->forward[i] = fval[i];
-
-        return new;
-    }
-}
-
-int main() {
-    struct Village* top = alloc_tree(max_level, 0, top, 0);
-}
-\end{lstlisting}
-\end{minipage}
-
-\quad One can view the recursive creation of the tree with all its node linking and allocation operations as the \textbf{backbone logic}. On the contrary, the node initialization forms a custom part and can be viewed as the \textbf{business logic}. The backbone logic of the health benchmark corresponds to the fractal computational framework. The business logic should go into corresponding customization slots of the framework. So, the high level task is to identify what kind of a backbone logic (what kind of a computational framework) the code is doing, decouple the backbone part from a custom business logic and to insert the business logic into appropriate interfaces of the identified computational framework. Technically, for benchmarks as simple as Olden the technique can work on the level of compiler's front end: source code or an abstract syntax tree (AST). Health benchmark is simple. After we have identified the backbone logic to be that of a fractal, we can simply strip it off. Everything what's left is the business logic. The next step is to insert different parts of the business logic into the right API interfaces of the computational framework. 
-
-\quad Listing \ref{lst:future_work_frameworks} shows what the final code should look like. Here we instantiate the fractal class template and fill its template methods with the extracted business logic. The next seed argument of the \textit{alloc\_tree()} function goes into the separate API slot of the framework, namely \textit{spawn\_child\_seed()}. The initialization of the village hospital goes into an overriden virtual \textit{grow()} method of the fractal element.
-
-\begin{minipage}[t]{\linewidth}
-\begin{lstlisting}[caption={Computational framework class template skeleton},label={lst:future_work_frameworks},language=C++]
-
-void Village::grow(Fractal_t::Seed_t s) {
-    if (this->element_info().level == 0) {
-        return;
-    } else {
-        this->seed = s * (IQ + ::seed); 
-        this->hosp.personnel = (int) pow(2, this->element_info().level-1);
-        this->hosp.assess.forward = NULL;
-        this->hosp.assess.back = NULL;
-        this->hosp.assess.patient = NULL;
-        this->hosp.waiting.forward = NULL;
-        ...
-        this->returned.patient = NULL;
-        return;
-    }
-}
-
-Fractal_t::Seed_t Village::spawn_child_seed(int child_id) {
-    return (4*this->label+child_id+1);
-}
-
-bool Village::growth_stop_condition() {
-    return false;
-}
-
-int main(int argc, char *argv[]) { 
-    Fractal_t fractal;
-    Fractal_t::Seed_t s = 0;
-    fractal.grow(max_level-1, s);
-}
-\end{lstlisting}
-\end{minipage}
-
-\quad We need to fish out of the original code the actual type of the fractal element as well. Listing \ref{lst:future_work_element_original} shows the original definition of the \textit{Village} structure. Listing \ref{lst:future_work_element_frameworks} shows the target source code to be generated, where all data fields and customization parts are framed into the library API.
-
-\begin{minipage}[t]{\linewidth}
-\begin{lstlisting}[caption={Computational framework class template skeleton},label={lst:future_work_element_original},language=C]
-struct Village {
-    struct Village* forward[4];
-    struct Village* back;
-    struct List returned;
-    struct Hosp hosp;   
-    int label;
-    long long seed;
-};
-\end{lstlisting}
-\end{minipage}
-
-\begin{minipage}[t]{\linewidth}
-\begin{lstlisting}[caption={Computational framework class template skeleton},label={lst:future_work_element_frameworks},language=C++]
-using Fractal_Element_t = class Village;
-using Fractal_Seed_t = int;
-const size_t Fractal_Arity = 4;
-using Fractal_t = Fractal<Fractal_Element_t,Fractal_Seed_t,Fractal_Arity>;
-
-class Village : public Fractal_t::Element {
-
-    public:
-        
-        Village(Fractal_t::ElementInfo info) : Fractal_t::Element(info) {}
-        ~Village() {}
-
-        void grow(Fractal_t::Seed_t seed) override;
-        Fractal_t::Seed_t spawn_child_seed(int child_id) override;
-
-        struct List returned;
-        struct Hosp hosp;
-        int label;
-        long long seed;
-};
-\end{lstlisting}
-\end{minipage}
-
-\quad For computation methods the process is alike to the one described above for growth methods. Figure \ref{fig:parallelization_scheme} illustrates the high level scheme of our approach. We call it an alternative parallelization scheme. Contrary to the 
-
-\begin{figure}[ht]
-\includegraphics[width=1.0\textwidth]{images/parallelization_scheme.png}
-\caption{An alternative software parallelization scheme. Works at the level of abstract syntax tree.}
+\quad The concept of computational frameworks and the prototype library form the basis for the future work. We believe that the process of software parallelization with the help of computational frameworks can be further automated for a relatively simple applications (like Olden benchmarks). Figure \ref{fig:parallelization_scheme} shows the scheme. It takes an original legacy C source code, where we supposedly have a computation that fits into one or several of our frameworks. The task of the recognizer is to identify a computational pattern. Like in the case of the \textit{health} Olden benchmark we have a recursive \textit{grow()} and \textit{compute()} procedures, which build and process the tree correspondingly. That recursive pattern can be matched to a fractal framework. The next step would be to strip the code corresponding and implementing the pattern (\textit{backbone logic}) and leave the rest as the \textit{business logic}. The business logic must be further classified into various computational framework template class methods (like \textit{grow()}, \textit{growth\_stop\_condition()}, \textit{inject()}, etc.). Then, the class template must be instantiated with the business logic inserted into the right places. Once that is done, the parallelization is done, as the compiler will take care of everything else.
+\begin{figure}[!htb]
+\includegraphics[width=1.0\textwidth]{images/parallelization_scheme.pdf}
+\caption{An alternative software parallelization scheme based on our library of computational frameworks.}
 \label{fig:parallelization_scheme}
-\end{figure}
+\end{figure}\newline\null
+\quad Technically, for benchmarks as simple as Olden the technique can work on the level of compiler's front end: source code or an abstract syntax tree (AST). That sets the technique apart from the regular parallelization approaches based on dependence graphs and working on the level of compiler's intermediate representation (IR).
 
+%%
