@@ -10,6 +10,24 @@
 @String{springer = "{Springer}" }
 @String{springer-address = "{Heidelberg, Germany}" }
 
+@inproceedings{assistant-aiseps,
+author = {Maramzin, Aleksandr and Vasiladiotis, Christos and Lozano, Roberto Casta\~{n}eda and Cole, Murray and Franke, Bj\"{o}rn},
+title = {“It Looks like You’Re Writing a Parallel Loop”: A Machine Learning Based Parallelization Assistant},
+year = {2019},
+isbn = {9781450369831},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3358500.3361567},
+doi = {10.1145/3358500.3361567},
+abstract = {Despite decades of research into parallelizing compiler technology, software parallelization remains a largely manual task where the key resource is expert time. In this paper we focus on the time-consuming task of identifying those loops in a program, which are both worthwhile and feasible to parallelize. We present a methodology and tool which make better use of expert time by guiding their effort directly towards those loops, where the largest performance gains can be expected while keeping analysis and transformation effort at a minimum. We have developed a novel parallelization assistant that provides programmers with a ranking of all loops in a program based on their overall merit. For each loop this metric combines its potential contribution to speedup and an estimated probability for its successful parallelization. This probability is predicted using a machine learning model, which has been trained, validated, and tested on 1415 labelled loops, achieving a prediction accuracy greater than 90\%. We have evaluated our parallelization assistant against sequential C applications from the SNU NAS benchmark suite. We show that our novel methodology achieves parallel performance levels comparable to those from expert programmers while requiring less expert time. On average, our assistant reduces the number of lines of code that have to be inspected manually before reaching expert-level parallel speedup by 20\%.},
+booktitle = {Proceedings of the 6th ACM SIGPLAN International Workshop on AI-Inspired and Empirical Methods for Software Engineering on Parallel Computing Systems},
+pages = {1–10},
+numpages = {10},
+keywords = {assistant tool, Compilers, machine learning, loop parallelization},
+location = {Athens, Greece},
+series = {AI-SEPS 2019}
+}
+
 @software{frameworks-repo,
  author = {Aleksandr Maramzin},
  title = {Computational Frameworks},
