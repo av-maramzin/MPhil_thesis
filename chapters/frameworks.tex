@@ -1,30 +1,28 @@
 \chapter{Computational Frameworks}
 \label{frameworks}
-
 \section{Introduction}
 \label{frameworks_introduction}
-\quad The problem of software parallelization is multifaceted. In order to arrive at the final solution a programmer has to work on multiple conceptual levels. The process of parallel software development starts on the high level of problem decomposition and algorithm choice along with choosing all supporting data structures. These tasks imply organization of communications and synchronization (if necessary) between parallel problem parts and require of programmer to possess a high level of algorithmic skills. When that is done a programmer starts implementation, which requires awareness of the lower level hardware specific optimizations. As program loops are particularly important on that level, this lower level work is addressed with our machine learning based loop parallelization assistant, which we described in the previous chapter \ref{assistant}. In this chapter though we describe our work on the notion of \textit{computational frameworks}, which is supposed to alleviate higher level and coarser grained parallelization tasks, as well as back it up with a prototype library implemention the notion. A programmer only needs to customize his computation through a modern and a well-defined interface.\newline\null
-\quad Computational frameworks \textbf{reduce the programmer's efforts} along the following lines:
+\quad The problem of software parallelization is multifaceted. In order to arrive at the final solution a programmer has to work on multiple conceptual levels. The process of parallel software development starts on the high level of problem decomposition followed by algorithm and data structure choice. These tasks imply organization of communications and synchronizations (if necessary) between parallel problem parts and require of programmer to possess a high level of algorithmic skills. When that is done a programmer starts implementation, which requires awareness of the lower level hardware specific optimizations. As program loops are particularly important on that level, this lower level work is addressed with our machine learning based loop parallelization assistant, which we described in the previous chapter \ref{assistant}. In this chapter though we describe our work on the notion of \textit{computational frameworks}, which is supposed to alleviate higher level and coarser grained parallelization tasks, as well as back it up with a prototype library implemention the notion. A programmer only needs to customize his computation through a modern and a well-defined interface.\newline\null
+\quad Computational frameworks are ready off-the-shelf solutions and thus they \textbf{reduce the programmer's efforts} along the following lines:
 \begin{itemize}[style=unboxed,leftmargin=0cm]
 \itemsep0em
 \renewcommand\labelitemi{$\vartriangleright$}
 \renewcommand\labelitemii{$\bullet$}
-\item \textbf{Software architecture design}. We provide a ready to use library of computational frameworks. The design of our library has been inspired by the style of the LLVM Pass Framework. In addition to that, we take the best ideas of software design patterns. So, using our library a programmer is partly relieved of a high level software architecture design task. Meanwhile, a programmer might be assured that the final piece of software is going to be modern, well-structured and efficient.   
-\item \textbf{Algorithm choice}. A parallelization hidden behind an LLVM-like interface of functional algorithmic patterns. Functional programming constructs (fold, map, reduce, etc.) are quite common, parallelizable, well-known and are good candidates for parallelization.
-\item \textbf{Data structure choice}. \item \textbf{Parallelization}.
+\item \textbf{Software architecture design}. The library of computational frameworks we provide is designed with the help of several well-known object-oriented software design patterns. Thus, by using our ready solutions a programmer is relieved of various higher level software design tasks. Meanwhile, a programmer might be assured that the final piece of software is going to be well-structured, easy to comprehend, use and maintain, as well as efficient.
+\item \textbf{Optimal algorithm and data structure choice}. The concept of computational frameworks we propose lives at the level higher than that of algorithms and their supporting data structures. Thus, building the program out of our computational frameworks a programmer works on the higher level of computational patterns. The latter can be implemented with different algorithms and data structures. All that happens under the hood and does not concern an average programmer. 
+\item \textbf{Parallelization}. Those computational frameworks that can principally be parallelized come with a parallel implementation in our library. A programmer does not have to worry about it. The implementation uses OpenMP and thus highly portable.
 \end{itemize}
-Given the high level of effort involved in manual parallelization, such a reduction can translate into substantial development cost savings.\newline\null
-\quad To demonstrate the utility of the notion as well as its potential, we deploy our library on the subset of Olden benchmarks. We rewrite the original legacy C versions of the benchmarks in a modern, better structured and crucially parallel way with the help of our computational frameworks. The parallel library version is consistently outperforming the sequential version hitting 5-6x speedups on the major benchmarks.
+\quad Given the high level of effort involved in manual parallelization, such a reduction can translate into substantial development cost savings. To demonstrate the utility of the notion as well as its potential, we deploy our library on the subset of Olden benchmarks. We rewrite the original legacy C versions of the benchmarks in a modern, better structured and crucially parallel way with the help of our computational frameworks. The parallel library version is consistently outperforming the sequential version hitting 5-6x speedups on the major benchmarks.
 \begin{center}
 \textbf{\large \textit{The motivating ground}}
 \end{center}
-\quad The introductory chapter \ref{introduction} has already outlined and highlighted the major problems of the field that motivate the project of computational frameworks. Among them:
+\quad The introductory Chapter \ref{introduction} has already outlined and highlighted the major problems of the software parallelization field, that motivate the project of computational frameworks. Among them:
 \begin{description}[style=unboxed,leftmargin=0cm]
 \itemsep0em
-\item[\textit{Data-centric parallelization (DCP) problem}] The problem of successful data structure choice stands particularly prominent and important. A wrong choice can break parallelization and an optimal one requires some programmer expertise and understanding. A tool, that could automatically recognize the type and properties of data structures and even automatically substitute them with a simpler, parallelizable and more suitable alternative data structures would make the parallelization process a lot easier, but it is not available at the moment due to a number of limitations.  
+\item[\textit{Data-centric parallelization (DCP) problem}] The problem of successful data structure choice stands particularly prominent and important. A wrong choice can break parallelization, while an optimal one requires programmer expertise and understanding. A tool, that could automatically recognize the type and properties of data structures and even automatically substitute them with a simpler, parallelizable and more suitable alternative would make the parallelization process a lot easier, but so far it is not available.
 \item[\textit{Limitations of "The state of the art" work}] Static shape analysis techniques \cite{Sagiv:1999:PSA:292540.292552},\cite{Wilhelm:2000:SA:647476.760384}, \cite{Ghiya:1996:TDC:237721.237724}
-give a very rough and conservative approximation (a \textit{Tree} (be it a binary tree or a linked-list), work with high error rates (\textit{DAGs} vs. \textit{Cycles}) and are provably undecidable. More recent pattern matching techniques \cite{Ginsbach:2018:CDS:3178372.3179515},\cite{Ginsbach:2017:DEG:3049832.3049862}, \cite{Ginsbach:2018:AML:3296957.3173182},\cite{Ginsbach:2018:AML:3296957.3173182} are limited to a relatively simple computational idioms and entities. Moreover, all static techniques are limited in their program view to a single compilation unit. The grand challenge of data structure recognition requires a much broader view. Dynamic techniques \cite{Rupprecht:2017:DID:3155562.3155607}\cite{Haller:2016:SDS:2938006.2938029}, \cite{Haller:2016:SDS:2938006.2938029}, \cite{Rupprecht:2017:DID:3155562.3155607}, \cite{1669122} come the closest to the solution of the DCP problem, but are still far from solving this grand problem for an arbitrary code. The arbitrary code might require not just a data structure comprehension, but an algorithms as well. 
-\item[\textit{Data structure and algorithm inseparability}] Understanding the data structure type might require understanding of the algorithm and vise versa; and the data structure substitution might lead to algorithm transformation. The task of separating data structures from algorithms seems infeasible. Moreover, for some applications and benchmarks it does not seem meaningful either. For example, the suite of Olden benchmarks is much simpler, than SPEC CPU2006, but also suffers from the same inseparability problem. For many of Olden benchmarks the data structures and algorithms are blended together, but the union they form can be framed into an elegant higher level entity of computational frameworks, that can later be parallelized in a nice and structured way.
+give a very rough and conservative approximation (a \textit{Tree} (be it a binary tree or a linked-list)), work with high error rates (\textit{DAGs} vs. \textit{Cycles}) and are provably undecidable. More recent pattern matching techniques \cite{Ginsbach:2018:CDS:3178372.3179515},\cite{Ginsbach:2017:DEG:3049832.3049862}, \cite{Ginsbach:2018:AML:3296957.3173182},\cite{Ginsbach:2018:AML:3296957.3173182} are limited to relatively simple computational idioms. Moreover, many static techniques are limited in their program view to a single compilation unit, while the grand challenge of data structure recognition requires a much broader view. Dynamic techniques \cite{Rupprecht:2017:DID:3155562.3155607}\cite{Haller:2016:SDS:2938006.2938029}, \cite{Haller:2016:SDS:2938006.2938029}, \cite{Rupprecht:2017:DID:3155562.3155607}, \cite{1669122} come the closest to the solution of the DCP problem, but are still far from tackling an arbitrary code. Additionally to data structure comprehension, the latter task requires algorithm understanding. 
+\item[\textit{Data structure and algorithm inseparability}] Understanding the data structure type might require understanding of the algorithm and vise versa; and the data structure substitution might lead to algorithm transformation. The task of separating data structures from algorithms seems infeasible. Moreover, for some applications and benchmarks it does not seem meaningful either. For example, the suite of Olden (see Section \ref{background_benchmarks_olden}) benchmarks is much simpler, than SPEC CPU2006 (see Section \ref{background_benchmarks_spec}), but also suffers from the same inseparability problem. For many of Olden benchmarks the data structures and algorithms are blended together, but the union they form can be framed into an elegant higher level entity of computational frameworks, that can later be parallelized in a nice and structured way.
 \item[\textit{The ever-going trend to higher abstraction levels}] For decades there has been an ongoing trend in the process of software engineering to move up in the levels of abstraction from a bare hardware to a higher level concepts closer to a human reasoning and understanding. Computational frameworks move from the level of algorithms and data structures to a new level of higher concepts.
 \end{description}
 \subsection{Contributions}
@@ -48,8 +46,8 @@ give a very rough and conservative approximation (a \textit{Tree} (be it a binar
 \end{itemize}
 \quad This chapter is structured in the following way. The next section \ref{frameworks_user_example} gives a quick how-to-use and an initial feel example. Section describes all the frameworks we have implemented in our library
 
-\section{User-side example}
-\label{frameworks_user_example}
+\section{Usage example}
+\label{frameworks_usage_example}
 \quad To get an initial feeling for what it is like to use our computational frameworks from a user perspective, let's consider a motivating example. The example also highlights the essential differences between the existent libraries and concepts and ours.\newline\null
 \quad Suppose we want to calculate a well-known functional programming concept of the \textit{left fold}, which also updates its elements with corresponding folded values, thus leaving some side effects. We can code that simple computation using C++ Standard Template Library (STL). Listing \ref{lst:left_fold_list} shows the code implementing the task with a list class template. First, we construct a list with 5 elements and initialize them to the value of 1. Then we loop through the list updating its elements and return the final left folded value. The task is small and the code is concise, but it is still possible to see its drawbacks. The code does not clearly separate concerns: list traversal, result computation and list transformation all happen in the same place and are mixed up together. For a better structuredness it would make sense to put these different pieces of functionality into separate places. Alternatively, we could use STL's std::accumulate() function template. The latter provides a programmer with a more concise and abstract interface, but does not allow any side effects. We would still need to write a separate chunk of code aimed at an update of the list elements.\newline\null 
 \quad In our project we propose an idea of computational frameworks. Listing \ref{lst:left_fold_framework} shows an alternative implementation of the left fold using our \textbf{Fold} computational framework. In order to use it a programmer has to be familiar with the concept of functional fold. The underlying implementation of the fold logic is a list traversal, which forms the backbone of the computation and is hidden behind the user interface our framework provides. The Fold uses standard C++ language facilities such as static and dynamic polymorphism and leans onto the compiler to do the major work. The user interafce resembles that of the LLVM Pass Framework. A programmer has to use a curiously recurring template pattern (CRTP) to inherit the set interface with its implementation. Although the code in listing \ref{lst:left_fold_framework} feels heavy for such a simple computation and is certainly an overkill, but when a computational task is significant our frameworks will do the job.
@@ -112,27 +110,62 @@ int main() {
 
 \section{Computational Frameworks}
 \label{computational_frameworks_main}
-\quad In this work we propose an idea of \textbf{computational frameworks} and we show its utility and use on a subset of Olden benchmarks. The idea grows on a wide review of the available parallel software development methodologies as well as on the understanding of problems in the task of software parallelization.
-
+\quad In this section we describe the general concept of \textbf{computational frameworks} along with all frameworks we have proposed and implemented in our prototype library.
 \subsection{The concept}
 \label{frameworks_concept}
-\quad In our project we propose a novel notion of computational frameworks.
-
-The notion of computational frameworks has been inspired by the current problems in the software parallelization field. 
-
-C++ library of computational frameworks. Computational frameworks are a blend of imperative, object-oriented and functional programming paradigms. They lift algorithm implementation in the C++ language to a higher level.
-Computational frameworks are a blend of algorithms and data structures as well as several programming paradigms such as imperative, object-oriented and functional programming. They lift C++ program implementations to a higher conceptual level. 
-
-User-exposed methods of classes are higher-order functions and can take custom function objects, function pointers, lambda functions and apply them to framework elements in a framework defined way. Unlike pure functions the application of user-defined functions to our computational frameworks can have side-effects.
-
-\quad Improves structuredness, modularity, separation of concerns and hides possible program parallelization behind the convenient user API.  
-
+\quad As we have already mentioned the concept of \textit{computational frameworks} has been inspired by the current problems in the software parallelization field along with computational patterns we have observed in the suite of Olden benchmarks. Very often programs are written with sub optimal from the point of software parallelization data structures. It might be hard to substitute them with parallelizable alternatives as the former might be closely entangled with algorithms the program is based on. Hence:
+\begin{itemize}[style=unboxed,leftmargin=0cm]
+\itemsep0em
+\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemii{$\bullet$}
+\item Computational frameworks solve the problem of data structure and algorithm inseparability;
+\end{itemize}
+\quad We might keep the two together, but still tackle the problem at a higher level. We call the higher level entity we operate with a computational framework. Computational emphasizes the algorithmic component, while framework hints towards the underlying data structure. 
+\begin{itemize}[style=unboxed,leftmargin=0cm]
+\itemsep0em
+\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemii{$\bullet$}
+\item Computational frameworks combine algorithms and data structures to form a higher level entity;
+\end{itemize}
+\quad Moreover, there are some specific problems, that could be tackled more effectively with specialized constructs. Imagine some task of scientific simulation. The scientific computation might be abundant with various higher level algorithmic constructs like maps, reductions, folds, stencils, etc. These concepts are characteristic of functional programming. The latter often forbids any mutable states. At the same time simulations often keep a significant state being updated and accumulated with every step. The presence of state is characteristic to an imperative programming. Here one can see a contradiction and hence the gap to fill: \begin{itemize}[style=unboxed,leftmargin=0cm]
+\itemsep0em
+\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemii{$\bullet$}
+\item Computational frameworks fill the gap between imperative and functional programming paradigms;
+\end{itemize}
+\quad With all the things said above it is human programmers, who are going to use the concept in the end. Hence, it must be human friendly and convenient. At the same time the code must be modern and effective. We designed an object-oriented library with a functional style interface consisting of higher order functions. While the algorithmic component of the given framework is immutable there is a custom user defined functionality to apply to the framework. That functionality comes as a function object through the framework's interface in accordance with a command and template method (see Section \ref{background_design} software design patterns. 
+\begin{itemize}[style=unboxed,leftmargin=0cm]
+\itemsep0em
+\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemii{$\bullet$}
+\item Computational frameworks provide a modern and convenient interface with elements of both functional, as well as object-oriented programming; and
+\item Computational frameworks embody the best ideas of various software design patterns. 
+\end{itemize}
+\quad When the software architecture has been designed, the exact efficient algorithm has been chosen along with all the most optimal and suitable data structures supporting its operation, a programmer can move onto the task of software parallelization. Here:  
+\begin{itemize}[style=unboxed,leftmargin=0cm]
+\itemsep0em
+\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemii{$\bullet$}
+\item Computational frameworks implement an effective and portable parallelization behind the hood.
+\end{itemize}
+\quad To conclude:
+\begin{itemize}[style=unboxed,leftmargin=0cm]
+\itemsep0em
+\renewcommand\labelitemi{$\vartriangleright$}
+\renewcommand\labelitemii{$\bullet$}
+\item Computational frameworks improve program \textbf{structuredness}, \textbf{modularity}, \textbf{separation of concerns} and hide possible \textbf{program parallelization} behind the \textbf{modern and convenient} user interface. 
+\end{itemize}
 \subsection{Fractal}
 \label{frameworks_fractal}
-\subsubsection{The notion}
-\quad The \textbf{Fractal} computational framework has been inspired by the theoretical work on tree reductions [] and 3 Olden benchmarks (health, treeadd, perimeter). Figure \ref{fig:fractal} illustrates the Fractal functionality.\newline\null
-\quad There are numerous data structures, computational patterns, processes and examples, which can be characterized as being fractals.\newline\null
-\quad The simplest example of fractal is an n-ary tree. Imagine we store some data at every node of the tree and want to accumulate it starting from the leaves at the very bottom and going all the way up to the root of the tree. Accumulation procedure processes every node by taking the result from all its children, making a computation and passing the result up to the parent element. The procedure may have some side-effects on the nodes and keeps the whole tree data structure along with its state in memory. In that sense it is not a stateless functional programming. At the same time the accumulation procedure can be passed as an argument to a higher-order compute function. The movement of data through the nodes of the tree from their children to their parents is the fixed and immutable part of an algorithm, whereas the accumulation procedure can be given as a parameter. The latter separates the algorithm into a well-structured user and library parts. The library part acts as a backbone and the user part grows on it. The computations described above lie at the basis of health and treeadd benchmarks.\newline\null
+\quad The \textbf{Fractal} computational framework is the key framework in our work. It has been inspired by the theoretical work on tree reductions [] and 3 Olden benchmarks (health, treeadd, perimeter) with a very similar computational pattern. Section \ref{background_benchmarks_olden} provided descriptions of the benchmarks, while Figure \ref{fig:fractal} illustrates the fractal concept.\newline\null
+\quad While there are numerous computational patterns, processes and examples, which can be framed into the fractal, for the simplest and the most illustrative example let's consider the following. Imagine an n-ary tree data structure.\newline\null
+\textbf{Fractal's growth}
+First, we grow the tree from the root down to its leaves. A node takes a seed to grow, grows and spawns the next set of seeds for all its children nodes. The latter continue the process of growth. In the most general case the growth can happen asymmetrically, i.e it can stop on some path down the tree, when some user specified condition is met for some nodes. In other words the tree becomes incomplete with some leaves growing deeper than others and some nodes not having some children. We saw that pattern in the perimeter benchmark (see Section \ref{background_benchmarks_olden}), when squares fell completely outside or inside the ring, they stopped to split further. Benchmarks health and treeadd grow complete trees and do not specify any stop conditions.\newline\null
+\textbf{Fractal's processing} When the tree is built, we can start to process it. On that stage we go in the opposite direction from the bottom up. We start to process leaves of the tree. For every node we do some custom computation along with updating its custom data and pass the computation's result up to its parent. Before we process any node we need to process all its children first. The latter happens independently and can safely be parallelized. The growth process can be parallelized as well.\newline\null
+\quad Figure illustrates 
+
+
+Imagine we store some data at every node of the tree and want to accumulate it starting from the leaves at the very bottom and going all the way up to the root of the tree. Accumulation procedure processes every node by taking the result from all its children, making a computation and passing the result up to the parent element. The procedure may have some side-effects on the nodes and keeps the whole tree data structure along with its state in memory. In that sense it is not a stateless functional programming. At the same time the accumulation procedure can be passed as an argument to a higher-order compute function. The movement of data through the nodes of the tree from their children to their parents is the fixed and immutable part of an algorithm, whereas the accumulation procedure can be given as a parameter. The latter separates the algorithm into a well-structured user and library parts. The library part acts as a backbone and the user part grows on it. The computations described above lie at the basis of health and treeadd benchmarks.\newline\null
 \begin{figure}[ht]
 \includegraphics[width=1.0\textwidth]{images/Fractal.pdf}
 \caption{The Fractal computational framework.}
@@ -140,9 +173,6 @@ User-exposed methods of classes are higher-order functions and can take custom f
 \end{figure}
 \quad A more complicated and interesting fractal example would be a square being continuously and recursively divided into 4 equal sub-squares (southwest, northwest, southeast and northeast). The deep-growing structure is actually a 4-ary tree as well. Imagine one wants to compute the perimeter of some figure. One way to do it would be to map the figure on the square plane and then turn the plane into a grid by continuously splitting the square into 4 equal sub-parts (southwest, northwest, southeast, northeast) till we reach the granularity size of the grid. Then we paint all the grid elements located inside the figure shape as black and those outside of it as white. We iterate over the grid and detect all points of color flips and add the size of the grid elements to the final sum, which at the end is going to approximate the perimeter of the figure. That is roughly what the perimeter benchmark does.\newline\null
 \quad In all its generality the fractal is a pattern, which can be characterized with self-similarity, repeatedness, structuredness, inherent parallelizability and the exact numeric values such as its depth and arity. All that naturally maps onto the C++ implementation as a class template we describe below.
-
-\subsubsection{The implementation}
-\quad Fractal is the key framework in our prototype library.
 
 
 \subsection{Fold}
