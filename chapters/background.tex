@@ -203,29 +203,14 @@ Visitor pattern roughly corresponds to fold.
 
 \section{Parallel Algorithmic Skeletons}
 
-\section{Benchmarks Studies}
+\section{Benchmark Studies}
 \label{background_benchmarks}
-\quad In our projects we used three benchmark suites. We trained our machine learning based loop parallelization assistant with Seoul National University's implementation of the NASA Parallel Benchmarks (NPB) \cite{snu-npb-benchmarks}. For the data-centric parallelization project we started with the SPEC CPU2006 benchmarks. The complexity of these and the perspective we derived for the SPEC CPU2006 suite study led us to a simpler suite of Olden benchmarks. We used the latter for the project of computational frameworks.\newline\null
-\quad Below we provide descriptions of the benchmarks so a reader can develop a better feel for the problems we tackle and the code we work with.\newline\null
+\quad In our projects we used three benchmark suites. We trained our machine learning (ML) based loop parallelization assistant \cite{assistant-aiseps} (see Chapter \ref{assistant}) with Seoul National University's implementation \cite{snu-npb-benchmarks} of the NASA Parallel Benchmarks (NPB) \cite{snu-npb-benchmarks}. The suite comes in two versions: sequential and parallelized with OpenMP. We used the latter to extract ML training labels. Moreover, the suite contains a load of various sorts of parallel loops, which makes it a good training set. For the data-centric parallelization (DCP) project we started with the SPEC CPU2006 benchmarks. The complexity level of that suite and the perspective we derived from the suite study led us to a simpler suite of Olden benchmarks. We used the latter for the project of computational frameworks (see Chapter \ref{frameworks}). Below we provide descriptions of benchmarks, so a reader can develop a better feel for the problems we tackle and the code we work with.
 \subsection{NASA Parallel Benchmarks (NPB)}
 \label{background_benchmarks_npb}
-\quad NAS Parallel Benchmarks (NPB) target performance evaluation of highly parallel supercomputers. There are 10 various benchmarks in the suite. Benchmarks perform various scientific computations. They solve various systems of linear equations, compute gradients, work with matrices (compute matrix transpose, inverse, etc.), solve differential equations, solve heat and diffusion equations on the mesh, compute 3d grids, but all of them work with the simplest flat arrays at the very core. 
-
-
-
-All these reasons make NPB benchmarks inherently parallel. Nonetheless, their automatic parallelization with the Intel Compiler did not improve the running time significantly. And for some benchmarks it even brought a slowdown. The effects of automatic parallelization can be seen in figure \ref{fig:benchmarks_runtime}. 
-
-
-NPB benchmarks only specify the computation to be done, but do not provide the actual implementation. We used the implementation from Seoul National University (SNU NPB).
-section \ref{background_challenges_automatic} showed. 
-
-
-Our machine learning based loop parallelization assistant. 
-
-Indeed, the suite consists of benchmarks based mostly on flat arrays and loop nests operating with them. There are a lot of simple reductions.    
-
-
-
+\quad NAS Parallel Benchmarks (NPB) \cite{nasa-parallel-benchmarks} target performance evaluation of highly parallel supercomputers. NPB are "paper-and-pencil" benchmarks, i.e they do not provide the exact implementation, but rather specify various computational problems at a higher level. There are various implementations. We used the one from Seoul National University (SNU) - SNU NPB \cite{snu-npb-benchmarks}.\newline\null
+\quad There are 10 various benchmarks in the suite. Benchmarks perform various scientific computations. They solve various systems of linear equations, compute gradients, work with matrices (compute matrix transpose, inverse, etc.), solve differential equations, solve heat and diffusion equations on the mesh, compute 3d grids, etc. The main data structure used in all SNU NPB benchmarks is a flat multidimensional array. These arrays are processed in loops of various complexity levels including embarrassingly parallel loops like (\textit{a[i] = b[i] + c[i]}), parallel copy and initialization loops (\textit{a[i] = b[i]} and \textit{c[i] = 0.0}), loops computing simple reductions, unrolled loops, multilevel nested loops and loops with uninlined function calls, as well as more complex loops with \textit{if} and \textit{switch} statements and loops with statically unknown iteration numbers and indirect array references (\textit{a[i] = b[c[i]]}).\newline\null
+\quad To the biggest part, these benchmarks are inherently parallel, but surprisingly their automatic parallelization with the best state-of-the-art Intel C/C++ Compiler (ICC) \cite{icc-compiler} results into a slowdown (see Section \ref{background_challenges_automatic}). Moreover ICC fails to recognize a lot of parallel loops. Our parallelization assisatant increases parallelization coverage and leads a programmer to achieve a manual expert level parallel benchmark performance faster. 
 \subsection{SPEC CPU2006}
 \label{background_benchmarks_spec}
 \quad The project of Data-Centric Parallelization (DCP) started with the feasibility studies of the SPEC CPU2006 benchmark suite. We studied the feasibility of the automatic data structure recognition techniques on these benchmarks. Although the benchmarks proved to be extremely complex for such techniques, these studies directed our further efforts and ultimately led to the concept of computational frameworks being an inseparable blend of data structures and algorithms. The key lessons we learnt from the SPEC CPU2006 benchmarks are an enormous complexity of the real legacy code and a very close relationship between data structures and algorithms. Let alone automatic techniques, it might take some weeks for an expert engineer to understand what a single benchmark is actually doing. Below we describe some of the benchmarks we looked at.
@@ -235,53 +220,61 @@ Indeed, the suite consists of benchmarks based mostly on flat arrays and loop ne
 \quad\textbf{Despite the complexity of its core function \textit{P7Viterbi()}, the benchmark presents a very high interest for the application of our computational frameworks. Reductions of maps perfectly fit the purpose. We view it as a future work.}
 \paragraph{400.perlbench} This benchmark is a cut-down Perl interpreter, which implements the regular expression matching state machine. The benchmark processes the bitcode of a compiled regular expression instruction by instruction. Although, instructions have the same size and are laid out linearly in memory, there might be branches and the whole processing happens in a linked-list offset directed fashion. That requires sequential execution and is far beyond the capabilities of any existent techniques.
 \quad\textbf{The benchmark is neither parallel nor a simple one. It makes no point to apply any recognition techniques here.}
-\paragraph{470.lbm} The benchmark implements a Lattice Boltzmann Method (LBM) and is a relatively simple one (around ~1400 LOC). The main underlying data structures our benchmark works with are the two 3D grids mapped onto a linear array space, which simulate incompressible fluids in 3D. The benchmark runs a specified number of time steps. During each time step the benchmark linearly runs along \textit{Src} array. Every array element represents a point from a 3D grid and consists of a number of velocity vector projections (South, North, East, West, Top, Bottom,  ... , South-East, etc.) at this point. The values of these projections are being combined and mapped in a stencil fashion onto adjacent elements of independent \textit{Dst} array. The computation is highly parallel and corresponds to a sweeping of \textit{xy} planes (one plane after another) along \textit{z} axis. The benchmark has already been parallelised with an OpenMP pragma in a per element fashion. This benchmark could potentially be used for the discovery of stencil computational idioms. Linear arrays being used in the benchmark do not represent a huge amount of interest from a data-centric point.\newline\null
-\quad\textbf{The benchmark operates with 3D grids laid out on regular arrays. The latter do not present a great deal of interest from the point of data structure recognition. It would be interesting to try to recognize an algorithmic stencil.}
-
+\paragraph{470.lbm} The benchmark implements a Lattice Boltzmann Method (LBM) and is a relatively simple one (around ~1400 LOC). The main underlying data structures our benchmark works with are the two 3D grids mapped onto a linear array space, which simulate incompressible fluids in 3D. The benchmark runs over arrays a specified number of time steps. Every array element represents a point from a 3D grid and consists of a number of velocity vector projections at this point. The values of these projections are being combined and mapped in a stencil fashion. The computation is highly parallel.\newline\null
+\quad\textbf{The benchmark operates with 3D grids laid out on regular arrays. The latter do not present a great deal of interest from the point of data structure recognition. Although, it would be interesting to try to recognize an algorithmic stencil.}
 \subsection{Olden}
 \label{background_benchmarks_olden}
-\quad Although our studies of SPEC CPU2006 benchmarks have proved their enormous complexity for the task of automatic data structure recognition, we have managed to get a good perspective and narrow our research path to a much simpler suite of Olden benchmarks. Computations and algorithmic patterns present in Olden benchmarks have ultimately led us to the concept of computational frameworks.\newline\null
-\quad Olden benchmark suite consists of 10 benchmarks. For our project we looked at 6 of those (bisort, health, perimeter, treeadd, mst and tsp benchmarks). The nature of different Olden benchmarks varies. Benchmarks health, treeadd and perimeter perform essentially the same computational pattern, but for different problems. We call that pattern a fractal. The latter is a computational framework, i.e the blend of a parallelizible algorithmic skeleton and a tree-based data structure. Different tree branches are being processed independently. Benchmarks tsp and mst solve 2 well-known graph problems namely travelling salesman problem and minimum spanning tree. The other 4 benchmarks perform scientific numerical computations and are bigger, more complex and less interesting from the point of data structure recognition.
+\quad Although the studies of SPEC CPU2006 benchmarks have proved their enormous complexity for the task of automatic data structure recognition, we acquired a good perspective and narrowed our research path to a much simpler suite of Olden benchmarks. Computations and algorithmic patterns present in Olden benchmarks have ultimately led us to the concept of \textit{computational frameworks} (see Chapter \ref{frameworks}).\newline\null
+\quad Olden benchmark suite consists of 10 benchmarks. For our project we looked at 6 of those (\textit{bisort}, \textit{health}, \textit{perimeter}, \textit{treeadd}, \textit{mst} and \textit{tsp} benchmarks). The nature of different Olden benchmarks varies. Benchmarks health, treeadd and perimeter perform essentially the same computational pattern, but for different problems. We call that pattern a fractal and it is basically a parallel tree growth and processing. Benchmarks tsp and mst solve 2 well-known graph problems namely travelling salesman problem (TSP) and minimum spanning tree (MST). The other 4 benchmarks perform scientific numerical computations and are bigger, more complex and less interesting from the point of data structure recognition.
 \paragraph{bisort}
 \textit{\textbf{Definition} A sorted sequence is a monotonically non-decreasing (or non-increasing) sequence. A bitonic sequence is a sequence with $x_{0} \leq ... \leq x_{k} \geq ... \geq x_{n} - 1$ for some k, or a circular shift of such a sequence.}\newline\null
-\quad The sequence is based on a binary tree implementation (recursive calls to left and right subtrees). The algorithm is based on a sorting comparator network consisting of several layers. The network can be and is implemented in a divide and conquer way similar to that of a well-known merge sort. Sort() function is called on the left and right array halves recursively. The merging step of the merge sort algorithm is substituted with compare-and-swap step. The latter is possible due to input sequences required to be bitonic.
+\quad The sequence is based on a binary tree implementation (recursive calls to the left and right subtrees). The algorithm is based on a sorting comparator network consisting of several layers. The network can be and is implemented in a divide and conquer way similar to that of a well-known merge sort. Sort() function is called on the left and right array halves recursively. The merging step of the merge sort algorithm is substituted with compare-and-swap step. The latter is possible due to input sequences required to be bitonic.\newline\null
 \quad\textbf{The benchmark is heavily based on pointers, tree swaps and rotations. It presents an interest from the point of divide and conquer algorithm recognition. Static techniques are unlikely to handle the legacy source code of that complexity and style. Dynamic techniques might be able to see the binary tree.}
-
-\paragraph{health} Out of all Olden benchmarks the health fits into the fractal computational framework the best and delivers the most promising performance results. All that has to do with certain properties of the benchmark. Health benchmark does a simulation of the Columbian healthcare system and is based on a complete 4-ary tree of $4^{max\_level}$ adjacent villages, where \textit{max\_level} is the depth of the tree. One can view the tree as the hierarchical structure reflecting various levels of municipal divisions: the root is the capital, leaves represent villages and the nodes on intermediate tree levels represent small towns and bigger cities. The closer to the root, the bigger the settlement and the level of hospital expertise is higher as well. Every tree node has its own hospital. Figure \ref{fig:health_benchmark} illustrates the tree. 
-\begin{figure}[ht]
-\includegraphics[width=1.0\textwidth]{images/village_tree.pdf}
-\caption{The \textbf{health} benchmark. Columbian healthcare system simulation.}
-\label{fig:health_benchmark}
+\paragraph{health} The health benchmark fits into the fractal computational framework the best and delivers the most promising performance results. All that has to do with certain properties of the benchmark. Health benchmark does a simulation of the Columbian healthcare system and is based on a complete 4-ary tree of $4^{max\_level}$ adjacent villages, where \textit{max\_level} is the depth of the tree. One can view the tree as the hierarchical structure reflecting various levels of municipal divisions: the root is the capital, leaves represent villages and the nodes on intermediate tree levels represent small towns and bigger cities. The closer to the root, the bigger the settlement and higher the level of hospital expertise. Every tree node has its own hospital. Figure \ref{fig:health_benchmark} illustrates the tree.
+\begin{figure}
+\centering
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{images/village_tree.pdf}
+  \captionof{figure}{The \textit{health} benchmark.}
+  \label{fig:health_benchmark}
+\end{minipage}%
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{images/power_scheme.pdf}
+  \captionof{figure}{The \textit{power} benchmark.}
+  \label{fig:power_benchmark}
+\end{minipage}
 \end{figure}
-\quad Simulation starts from the top (tree root village and goes down all the tree branches recursively right to left.
-
-
-
-
-Every simulation step consists of several stages:
-\begin{enumerate}
-  \item Accept all patients from adjacent villages and put them in the local hospital for an initial assessment and possibly for further hospitalization inside the local hospital.
-  \item Check patients who are inside the local hospital: once inside patients spend time to recover and occupy 1 member of the staff throughout all time. If time have passed then the patient is checked out and releases 1 personnel member.
-  \item Check patients on the assessment list. Patients require some time to be diagnosed. Each patient occupies 1 member of the staff throughout the whole assessment process. If patient is ill then he continues to occupy the same personnel member and goes inside the hospital. If patient is healthy then the patient is checked out and releases 1 staff member.
-  \item Check patients on the waiting list. Once a patient gets into the hospital he/she takes on 1 member of the staff if the personnel is available. If not, then the patient goes onto the waiting list. Patient passes through 2 phases: assessment and hospitalisation. Each patient is being supervised by 1 member of the personnel starting from assessment and up until checking out of the hospital. If after assessment a patient turns out to be healthy then the patient is checked out and a personnel member is returned back to available pool. If patient is confirmed ill, then the former is put inside the hospital and spends time there. Patients fall ill at the will of a random number generator.
-\end{enumerate}
-
+%\begin{figure}[ht]
+%\begin{center}
+%\includegraphics[width=0.5\textwidth]{%images/village_tree.pdf}
+%\caption{The \textbf{health} %benchmark. Columbian healthcare system %simulation.}
+%\label{fig:health_benchmark}
+%\end{center}
+%\end{figure}
+\quad Simulation starts at the tree root and goes down to the leaves. There are people who fall ill in every village and when they do they go into the local hospital for an assessment and in case they are ill for treatment. If local staff cannot give an accurate diagnosis a patient goes up the tree to a bigger settlement with a higher staff expertise level. As the simulation goes the lists of patients waiting, under assessment or inside the hospital for treatment grow and the benchmark state becomes bigger. So does the workload. The computation is parallel: all tree node child sub-trees can be simulated independently. Child nodes pass lists of patients to their parents and the latter take them to their local hospital.     
 \textbf{The benchmark operates with quad tree structures and does it in a highly parallel fashion. In our work we call that pattern a fractal. The latter is a computational framework, i.e. the blend of an algorithm and a data structure. The whole structure can be aimed at for an automatic recognition (not just a separate tree or an algorithmic skeleton, but both) even with static techniques.}
-
-\paragraph{perimeter} The benchmark computes the perimeter of a ring (R=2048, r=1024). The ring is mapped onto a grid of elements by painting all the grid elements inside the ring ($r^{2} < x*x + y*y < R^{2}$) as black and all grid elements outside of it as white. Then the grid is being traversed in two different (implementation dependent) ways and detects all flips of color (black to white and vice versa) to sum them up into the final perimeter approximation. The grid is implemented as a quad tree based fractal. The initial square is split into 4 parts (northwest, northeast, southwest, southeast), which in their turn split further on. The process reminds the fractal framework from the health benchmark.  
-
+\paragraph{perimeter} The benchmark computes the perimeter of a ring (R=2048, r=1024). The ring is mapped onto a grid of elements by painting all the grid elements inside the ring ($r^{2} < x*x + y*y < R^{2}$) as black and all grid elements outside of it as white. Then the grid is being traversed in two different (implementation dependent) ways and detects all flips of color (black to white and vice versa) to sum them up into the final perimeter approximation. The grid is implemented as a quad tree based fractal. The initial square is split into 4 parts (northwest, northeast, southwest, southeast), which in their turn split further on. The process reminds the fractal framework from the health benchmark.
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=1.0\textwidth]{images/perimeter_benchmark.png}
+\caption{The \textbf{perimeter} benchmark. Columbian healthcare system simulation.}
+\label{fig:health_benchmark}
+\end{center}
+\end{figure}
 \paragraph{power} The second by importance is the power pricing computation benchmark. The benchmark is based on a composite structure of C arrays and pointer-based linked lists of various objects such as Root, Laterals, Branches and Leaves. Figure \ref{fig:power_benchmark} illustrates the data structure. The algorithm is basically composed of folds and reductions. C arrays are reduced and linked lists are folded. The algorithm works recursively and starts with the Root::compute() call. The method accumulates power demand
 Demand(P,Q) from all lists of Laterals. Accumulation starts with the end of each list. Each lateral accumulates its power demand from all its branches and the latter in turn accumulate power demand from all their leaves. The leaves call
 optimize\_node() method, which does a chunk of scientific computations (gradients, vectors, etc.), which compute P and Q. Finally, Root::compute() is called iteratively from a while
 loop of power\_pricing\_problem(). Iteration continues up until P and Q error becomes less than the required epsilon. 
-\begin{figure}[ht]
-\includegraphics[width=1.0\textwidth]{images/power_scheme.pdf}
-\caption{The Power benchmark.}
-\label{fig:power_benchmark}
-\end{figure}
-
+%\begin{figure}[ht]
+%\begin{center}
+%\includegraphics[width=0.5\textwidth]{%images/power_scheme.pdf}
+%\caption{The Power benchmark.}
+%\label{fig:power_benchmark}
+%\end{center}
+%\end{figure}
 \paragraph{treeadd} The treeadd benchmark is a very small and simple one. It does a recursive reduction on a pointer-linked binary tree. To create a workload the reduction is done repetitively inside the loop.   
-
 \paragraph{mst} Minimum Spanning Tree (MST) benchmark does a MST weight computation of a complete graph. Computation is approximate and the algorithm looks like it might finish with incorrect result. Nevertheless, the benchmark can be used for the purpose of computational workload. Graph is represented as a linked list of vertices. Every node in the list has a hash table of incident edges. Graph is complete: each vertex is connected to all other vertices in the graph (except itself). Algorithm repeatedly traverses the list of vertices and gradually accumulates the MST weight. On every traversal algorithm picks the node in the list to use as an input for the next traversal. In that sense, there is a cross iteration/traversal dependency. The code below summarises the benchmark.\newline\null
 \begin{minipage}[t]{\linewidth}
 \begin{lstlisting}[caption={The main algorithm of mst benchmark.},label={lst:mst_code},language=C]
@@ -296,12 +289,8 @@ while (num_vertices) {
 return mst_weight;
 \end{lstlisting}
 \end{minipage}
-
 \paragraph{tsp} Travelling Salesman Problem (TSP). The benchmark generates a set of dots scattered on a 2D plane. Dots represent cities and are specified by their (x,y) coordinates. The TSP problem is to visit all the cities and return to the city of origin having passed the minimal distance. In other words, the algorithm returns a cycled sequence of cities, where proximity of elements in the sequence in terms of order means their spatial proximity on the 2D plane.\newline\null
 \quad The algorithm’s work resembles that of an insertion sort. The sequence is divided into 2 parts. Ordered part and unordered part. At first, ordered part consists of just 1 element. On every iteration the algorithm takes the next element out of unordered part, finds it a pairing element inside the ordered part (with the minimal distance between them) and inserts the element into the ordered subsequence next to its pair. At the end we get the sequence with the property that closest dots stand the closest in the sequence.\newline\null
 \quad The benchmark is based on a binary tree being transformed into doubly linked list. Every node of the tree represents a city located on 2D plane with randomly generated (x,y) coordinates. The build\_tree() method is written in a way to generate a uniform distribution of dots on the plane.
 
-
-
-
-
+%
