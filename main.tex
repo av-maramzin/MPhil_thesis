@@ -33,10 +33,10 @@
 %%  draft: produce a single-spaced, double-sided thesis with narrow margins
 %%
 %% For a PhD thesis -- you must also specify a research institute:
-\documentclass[mphil,icsa,twoside]{infthesis}
+%\documentclass[mphil,icsa,twoside]{infthesis}
 
 %% For an MPhil thesis -- also needs an institute
-% \documentclass[mphil,ianc]{infthesis}
+\documentclass[mphil,icsa]{infthesis}
 
 %% MSc by Research, which also needs an institute
 % \documentclass[mscres,irr]{infthesis}
@@ -119,7 +119,7 @@
 
 %% Information about the title, etc.
 \title{
-{Towards Alleviating The Task of Software Parallelization}\\
+{Towards Alleviating The Software Parallelization}\\
 {\includegraphics[width=50mm,scale=0.5]{eushield-normal.pdf}}
 }
 \author{Aleksandr Maramzin}
@@ -136,9 +136,9 @@
 
 %\quad Parallelism has become pervasive in the world of computing. Parallel hardware is omnipresent across the whole spectrum of various computing systems from low-end embedded processors to high-end supercomputers. To take advantage of all the hardware capabilities available software has to be parallel as well.
 
-Despite decades of research into parallelizing compiler technology, \textit{software parallelization} still remains a largely manual task, which is complex, time consuming and error-prone. An embarrassingly parallel problem can be hidden behind a serial algorithm, thoughtless software design or unsuccessfully chosen lower level constructs, such as data structures. To elegantly and effectively map a parallel problem onto the exact hardware a programmer must possess an expert-level knowledge in the range of various fields from software design and algorithmic patterns down to automatic vectorization and cache coherence. We do not strive to find a "silver bullet" and solve the task of automatic parallelization. Neither do we expect an average programmer to be an expert. Instead, we acknowledge the role a programmer plays in the parallelization process and equip the former with an \textit{assistant solution}. Our solution alleviates the task and makes it more accessible for an average programmer.\newline\null
+Despite decades of research into parallelizing compiler technology, \textit{software parallelization} still remains a largely manual task, which is complex, time consuming and error-prone. An embarrassingly parallel problem can be hidden behind a serial algorithm, thoughtless software design or unsuccessfully chosen lower level constructs, such as data structures. To elegantly and effectively map a parallel problem onto the exact hardware a programmer must possess an expert-level knowledge in the range of various fields from software design and algorithmic patterns down to automatic vectorization and cache coherence. We do not strive to find a "silver bullet" and solve the task of automatic parallelization. Neither do we expect an average programmer to be an expert. Instead, we acknowledge the role a programmer plays in the parallelization process and equip the former with an \textit{assistant solution}. Our solution alleviates the task and makes it more accessible to an average programmer.\newline\null
 \quad The assistant solution consists of a tool and a library aiming at different stages of software parallelization. The library implements the novel notion of \textit{computational frameworks}. The latter help a programmer with a coarse-grained parallelization tasks, such as software design, algorithm and data structure choice. The library provides a user with a well-designed, modern and convenient interface. We prototyped the library on the suite of Olden benchmarks. The parallel library version is consistently outperforming the sequential version hitting 5-6x speedups on the major benchmarks.\newline\null
-\quad The tool aims at finer levels of granularity. Program loops are often the richest source of parallelism and account for the biggest portion of the running time. The tool identifies those loops, which are both worthwhile and feasible to parallelize. For each loop the tool combines its potential contribution to speedup and an estimated probability for its successful parallelization. This probability is predicted using a machine learning model, which has been trained and tested on 1415 labelled loops, achieving a prediction accuracy greater than 90\%. We present a methodology which makes a better use of an expert time by guiding them directly towards those loops, where the largest performance gains can be expected while keeping analysis and transformation effort at a minimum. We have evaluated our parallelization assistant against sequential C applications from the SNU NAS benchmark suite. We show that our novel methodology achieves parallel performance levels comparable to those from expert programmers while requiring less expert time. On average, our assistant reduces the number of lines of code that have to be inspected manually before reaching expert-level parallel speedup by 20\%.
+\quad The tool aims at finer granularity levels. Program loops are often the richest source of parallelism and account for the biggest portion of the running time. The tool identifies those loops, which are both worthwhile and feasible to parallelize. For each loop the tool combines its potential contribution to speedup and an estimated probability for its successful parallelization. This probability is predicted using a machine learning model, which has been trained and tested on 1415 labelled loops, achieving a prediction accuracy greater than 90\%. We present a methodology which makes a better use of an expert time by guiding them directly towards those loops, where the largest performance gains can be expected while keeping analysis and transformation effort at a minimum. We have evaluated our parallelization assistant against sequential C applications from the SNU NAS benchmark suite. We show that our novel methodology achieves parallel performance levels comparable to those from expert programmers while requiring less expert time. On average, our assistant reduces the number of lines of code that have to be inspected manually before reaching expert-level parallel speedup by 20\%.
 }
 
 %% Now we start with the actual document.
