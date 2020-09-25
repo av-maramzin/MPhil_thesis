@@ -343,29 +343,29 @@ their efforts trying to parallelize loops which may be long-running, but offer l
 
 \subsection{Comparison to Static Analysis} 
 \quad We have compared the generated loop parallelizability classifications of our assistant against that of the ICC Compiler, which due to its use of static analysis is conservative and occasionally misses some parallelization opportunities. The ML approach to parallelization with a human programmer responsible for final code transformation allows our parallelization assistant to be more aggressive than the ICC Compiler. In other words, our model can predict more loops as parallelizable. 
-\begin{table}
-  \tabulinesep=2pt
-  \caption{Possible loop classification combinations for the side-by-side setup of our ML predictor and the ICC Compiler.}
-  \begin{minipage}{\columnwidth}
-  \begin{center}
-    \begin{tabu}{M{0.7cm}M{1.4cm}M{3cm}M{5cm}}
-      \hline
-      \rowfont{\bfseries}
-      ICC & Predictor & True Parallel & Classification\\%\hline
-      \hline
-      0 & 0 & 0 & icc/predictor agreement\\
-      0 & 0 & 1 & missed opportunity\\
-      0 & 1 & 0 & false positive\\
-      0 & 1 & 1 & discovery\\
-      1 & 0 & 0 & impossible\\
-      1 & 0 & 1 & icc shielding\\
-      1 & 1 & 0 & impossible\\
-      1 & 1 & 1 & icc/predictor agreement\\\hline  
-    \end{tabu}
-  \end{center}
-  \end{minipage}
-  \label{tab:combinations_table}
-\end{table}%
+%\begin{table}
+%  \tabulinesep=2pt
+%  \caption{Possible loop classification %combinations for the side-by-side setup of %our ML predictor and the ICC Compiler.}
+%  \begin{minipage}{\columnwidth}
+%  \begin{center}
+%    \begin{tabu}{M{0.7cm}M{1.4cm}M{3cm}M{5c%m}}
+%      \hline
+%      \rowfont{\bfseries}
+%      ICC & Predictor & True Parallel & %Classification\\%\hline
+%      \hline
+%      0 & 0 & 0 & icc/predictor agreement\\
+%      0 & 0 & 1 & missed opportunity\\
+%      0 & 1 & 0 & false positive\\
+%      0 & 1 & 1 & discovery\\
+%      1 & 0 & 0 & impossible\\
+%      1 & 0 & 1 & icc shielding\\
+%      1 & 1 & 0 & impossible\\
+%      1 & 1 & 1 & icc/predictor %agreement\\\hline  
+%    \end{tabu}
+%  \end{center}
+%  \end{minipage}
+%  \label{tab:combinations_table}
+%\end{table}%
 
 We have set up an experiment where we apply our ML predictor side-by-side with the ICC Compiler. Both aim at independently
 classifying loops as parallelizable or not. There is a total of six possible classification combinations that our scheme can produce (summarized in Table \ref{tab:combinations_table}). The first and last table rows show the agreement cases, where the ICC Compiler and the ML predictor identically classify truly (non-)parallelizable loops as (non-)parallelizable. The ``missed opportunity'' cases where both ICC Compiler and ML predictor miss parallelizable loops also represent agreement and are not interesting. The most interesting cases are those where the ML predictor and the ICC Compiler disagree. While ICC Compiler is conservative and will never classify a non-parallelizible loop as parallelizible, the statistical ML predictor can make a ``false positive'' error. That works in the opposite direction as well. The ML predictor can discover truly parallelizible loops which escape compiler analysis. These cases are classified as ``discovery'' and have been manually checked in the source code of SNU NPB. The results are summarized in Table \ref{tab:icc_missed_opportunities}, which reports on the reasons behind ICC conservativeness. False negative mispredictions make the ML predictor miss some real parallelization opportunities, but in the fraction of these cases the ICC Compiler can catch them and ``shield'' the ML predictor.
@@ -394,7 +394,7 @@ Figure \ref{fig:icc_competition} shows the relative frequency of different loop 
     %\begin{minipage}{\columnwidth}
     \centering
     %\includegraphics[trim=1mm 1mm 1mm 1mm,clip,width=0.9\columnwidth]{figures/icc_vs_predictor.pdf}
-    \includegraphics[width=0.9\columnwidth]{images/pie.pdf}
+    \includegraphics[width=0.6\textwidth]{images/pie.pdf}
     \caption{
       Distribution of loop classification by the ICC Compiler and our predictor.}
     \label{fig:icc_competition}
@@ -404,7 +404,7 @@ Figure \ref{fig:icc_competition} shows the relative frequency of different loop 
 
 \begin{figure*}[t!]
 \centering
-\includegraphics[width=0.95\textwidth]{images/perf_conv_curves_new.pdf}
+\includegraphics[width=1.0\textwidth]{images/perf_conv_curves_new.pdf}
 \caption{From left to right more loops are parallelized for each benchmark. As we parallelize more loops, program execution times improve over the initial sequential performance and reach the performance level of the reference OpenMP implementations. Our ML based parallelization assistant requires the user to parallelize fewer loops than a purely profile-guided approach to reach the maximum parallel speedup.}
 \label{fig:performance_convergence_line}
 \vspace*{5mm} % Just to fill up the rest of the page
