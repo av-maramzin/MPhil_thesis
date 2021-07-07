@@ -2,18 +2,18 @@
 \label{assistant}
 \section{Introduction}
 
-% problem: the need for manual parallelization, auto-parallelisation does not deliver desired performance improvements
+% problem: the need for manual parallelization, auto-parallelization does not deliver desired performance improvements
 
 \quad Parallel hardware is ubiquitous through the entire spectrum of computing systems, from low-end embedded devices to high-end supercomputers.
 %
-Yet, most of the existing software is written in a sequential fashion.
+Yet, most of the existing software is sequential.
 %
 Despite decades of intensive research in automatic software
 parallelization~\cite{6813266}, fully exploiting the potential of modern parallel hardware still requires a significant manual effort.
 %
 Given the difficulty of the obstacles faced by automatic parallelization today, we do not expect that programmers will be liberated from performing manual parallelization in the near future~\cite{Larsen:2012:PML:2410141.2410600}.
 
-% solution: parallelisation assistant
+% solution: parallelization assistant
 
 This chapter introduces a novel parallelization assistant that aids a programmer in the process of parallelizing a program in the frequent case where automatic approaches fail.
 %
@@ -27,7 +27,7 @@ At the core of our parallelization assistant resides a novel machine-learning (M
 %
 Loops are compelling candidates for parallelization, as they are naturally decomposable and tend to capture most of the execution time in a program.
 %
-Furthermore, focusing on loops allows the model to leverage a large amount of specific analyses available in modern compilers, such as generalized iterator recognition~\cite{Manilov:2018:GPI:3178372.3179511} and loop dependence analysis~\cite{Jensen:2017:ILD:3132652.3095754}.
+Furthermore, focusing on loops allows the model to leverage a large number of specific analyses available in modern compilers, such as generalized iterator recognition~\cite{Manilov:2018:GPI:3178372.3179511} and loop dependence analysis~\cite{Jensen:2017:ILD:3132652.3095754}.
 %
 The model encodes the results of these analyses together with basic properties of the loops as machine learning \textit{features}.
 
@@ -67,7 +67,7 @@ Table~\ref{tab:ranking} shows the top three CG loops as ranked by the Intel
 Profiler (based on their execution time) and by our parallelization
 assistant (additionally taking into account their parallelizability).
 %
-Both rankings include the same loops, but, crucially, the loops are \textbf{ranked in a different order}.
+The ranked loops compose the same loop nest with \texttt{cg.c:296} being the outermost loop and the loop \texttt{cg.c:458} being the innermost. The profiler ranks their execution time in the nesting order, while our assistant highlights the same loop nest, but, crucially, the loops are \textbf{ranked in a different order} with the innermost \texttt{cg.c:458} coming first.
 \begin{table}
   \begin{minipage}{\columnwidth}
   \begin{center}
@@ -77,9 +77,9 @@ Both rankings include the same loops, but, crucially, the loops are \textbf{rank
       \multirow{2}{*}{Ranking} & Profiler & \multicolumn{2}{c}{Assistant} \\ \cline{2-4}
       \rowfont{\bfseries}
       & loop & loop & parallelizability\\\hline
-      1 & \texttt{cg.c:326} & \textbf{\texttt{cg.c:509}} & 85\%\\
-      2 & \texttt{cg.c:484} & \texttt{cg.c:326} & 29\%\\
-      3 & \textbf{\texttt{cg.c:509}} & \texttt{cg.c:484} & 8\%\\\hline
+      1 & \texttt{cg.c:296} & \textbf{\texttt{cg.c:458}} & 85\%\\
+      2 & \texttt{cg.c:445} & \texttt{cg.c:296} & 29\%\\
+      3 & \textbf{\texttt{cg.c:458}} & \texttt{cg.c:445} & 8\%\\\hline
     \end{tabu}
     \caption{Comparison of the profiler and assistant rankings for the CG benchmark loops (limited to the top three loops).}
     \label{tab:ranking}
@@ -87,26 +87,23 @@ Both rankings include the same loops, but, crucially, the loops are \textbf{rank
   \end{minipage}
 \end{table}%
 Following the profiler ranking (second column in Table~\ref{tab:ranking}), a
-parallelization expert would concentrate on analyzing the loop \texttt{cg.c:326}
-first.
+parallelization expert would concentrate on analyzing the longest running outermost loop \texttt{cg.c:296} first.
 %
 % Note: the 100 lines of code are counted using 'cloc code/cg-326.c'.
 %
 Analyzing this loop turns out to be costly (it consists of 100+ lines of code)
-and unfruitful (it is actually not parallelizable due to inter-iteration
+and unfruitful (it is not parallelizable due to inter-iteration
 dependencies and side effects, see Listing~\ref{lst:main_iter}).
 %
-This analysis would be followed by an equally unfruitful analysis of
-loop \texttt{cg.c:484}.
+This analysis would be followed by an equally unfruitful analysis of \texttt{cg.c:445} being the middle loop in the nest.
 
 In contrast, our parallelization assistant (two last columns in
-Table~\ref{tab:ranking}) ranks the loop \textbf{\texttt{cg.c:509}} before
-loops \texttt{cg.c:326} and \texttt{cg.c:484}, as it finds that the former has a
+Table~\ref{tab:ranking}) ranks the innermost loop \textbf{\texttt{cg.c:458}} before its two enclosing loops \texttt{cg.c:296} and \texttt{cg.c:445}, as it finds that the former has a
 significantly higher probability of being parallelizable (see last column in
 Table~\ref{tab:ranking}).
 %
 Following the assistant's ranking, a parallelization expert would thus
-concentrate on analyzing the loop \textbf{\texttt{cg.c:509}} first.
+concentrate on analyzing the loop \textbf{\texttt{cg.c:458}} first.
 %
 Analyzing this loop is inexpensive (it consists of only six lines of code, see
 Listing~\ref{lst:reduction}) and fruitful: its parallelization speeds up CG by a
@@ -116,8 +113,10 @@ benchmark.
 Hence, following the ranking proposed by our assistant, a parallelization expert
 can achieve most of the available speedup in CG in a fraction of the time
 required by a traditional profile-guided parallelization process.
+% Amdahl's law
+
 \begin{figure}[t]
-\begin{lstlisting}[caption={\texttt{cg.c:326}. Longest running loop in CG. The loop cannot be parallelized due to
+\begin{lstlisting}[caption={\texttt{cg.c:296}. The longest running loop in CG. The loop cannot be parallelized due to
 inter-iteration dependences and side effects caused by system calls.},label={lst:main_iter},language=C]
 for (it = 1; it <= NITER; it++) {
   ...
@@ -129,15 +128,23 @@ for (it = 1; it <= NITER; it++) {
   ...
 }
 \end{lstlisting}
-\begin{lstlisting}[caption={\textbf{\texttt{cg.c:509}}. Longest running loop in CG among those \emph{that can be parallelized}.},label={lst:reduction},language=C]
-for (j = 0; j < lastrow-firstrow+1; j++) {
+\begin{lstlisting}[caption={\textbf{\texttt{cg.c:458}}. Longest running loop in CG among those \emph{that can be parallelized}. Parallelization pragmas are also added to demonstrate its parallelization.},label={lst:reduction},language=C]
+// lastrow - firstrow + 1 = NA, NA is the workload parameter (S=1400,M=7000,L=140000,...)
+#pragma omp parallel for default(shared) private(j,k,suml)
+for (j = 0; j < lastrow - firstrow + 1; j++) {
   suml = 0.0;
-  for (k = rowstr[j]; k < rowstr[j+1]; k++)
+  for (k = rowstr[j]; k < rowstr[j+1]; k++) {
     suml = suml + a[k]*p[colidx[k]];
+  }
   q[j] = suml;
 }
 \end{lstlisting}
 \end{figure}
+
+It would also be interesting to give a theoretical assessment of the possible CG parallel speedups with the Amdahl's law \cite{10.1145/1465482.1465560}. The benchmark CG contains a number of parallelizable loops and some serial parts. The Intel Profiler reports that the main loop nest takes up 93\% of CG execution time and contains a number of parallelizable loops inside, but the longest running \textbf{\texttt{cg.c:509}} takes up roughly 90\% of the total CG running time. It would be precise enough to assume, that 95\% of CG running time is spent executing parallelizable sections of the code. With 90\% of execution happening withing \textbf{\texttt{cg.c:509}}. The Amdahl's law derivation would yield the following estimate $s=\frac{20}{1+1/m+18/n}$, where m and n factors characterize the speedup of the corresponding parallel parts. On the 4 core machine we conducted the experiment the factors would be around 4. So, the theoretical parallel speedups would be 3.5x for the whole CG benchmark and 3x for the innermost loop only. The theoretical speedup corresponds to what we observe experimentally (3.25x and 2.8x).      
+
+
+
 \subsection{Contributions of our Loop Parallelization Assistant}
 \quad In summary, this chapter makes the following contributions:
 %
