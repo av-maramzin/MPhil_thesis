@@ -10,6 +10,285 @@
 @String{springer = "{Springer}" }
 @String{springer-address = "{Heidelberg, Germany}" }
 
+@article{tree-reductions-paper,
+author = {Matsuzaki, Kiminori and Miyazaki, Reina},
+title = {Parallel Tree Accumulations on MapReduce},
+year = {2016},
+issue_date = {June      2016},
+publisher = {Kluwer Academic Publishers},
+address = {USA},
+volume = {44},
+number = {3},
+issn = {0885-7458},
+url = {https://doi.org/10.1007/s10766-015-0355-8},
+doi = {10.1007/s10766-015-0355-8},
+abstract = {MapReduce is a remarkable parallel programming model as well as a parallel processing
+infrastructure for large-scale data processing. Since it is now widely available on
+cloud environments, developing methodology or patterns for MapReduce programming is
+important. In particular, XML is the de facto standard for representing data, and
+processing semi-structured data is involved in many applications. The target computational
+patterns in this paper are tree accumulations. Tree accumulations are shape-preserving
+computations over a tree in which values are updated through flows over the tree.
+We develop BSP algorithms for two tree accumulations as extensions of the BSP algorithm
+for tree reduction by Kakehi et al. (Tech. Rep. METR 2006-64, Department of Mathematical
+Informatics, Graduate School of Information Science and Technology, The University
+of Tokyo, 2006). We also implemented the two-superstep algorithms with a single MapReduce
+execution. Experimental results on a 16-node PC cluster show good speedups of a factor
+of 10.9---12.7.},
+journal = {Int. J. Parallel Program.},
+month = jun,
+pages = {466–485},
+numpages = {20},
+keywords = {Tree accumulations, MapReduce, Hadoop, Bulk synchronous parallel (BSP) model}
+}
+
+@INPROCEEDINGS{9092377,
+authors = {Brown, C. and Janjic, V. and Barwell, A. and Thomson, J. and Lozano, R. Castañeda and Cole, M. and Franke, B. and Garcia-Sanchez, J.D. and Astorga, D. Del Rio and MacKenzie, K.},
+booktitle = {2020 28th Euromicro International Conference on Parallel, Distributed and Network-Based Processing (PDP)}, 
+title = {A Hybrid Approach to Parallel Pattern Discovery in C++}, 
+year = {2020},
+volume = {},
+number = {},
+pages = {187-191},
+doi = {10.1109/PDP50117.2020.00035}
+}
+
+@INPROCEEDINGS{7445342,
+authors = {Janjic, V. and Brown, C. and Mackenzie, K. and Hammond, K. and Danelutto, M. and Aldinucci, M. and Garcia, J. Daniel},
+booktitle = {2016 24th Euromicro International Conference on Parallel, Distributed, and Network-Based Processing (PDP)}, 
+title = {RPL: A Domain-Specific Language for Designing and Implementing Parallel C++ Applications}, 
+year = {2016},
+volume={},
+number={},
+pages={288-295},
+doi={10.1109/PDP.2016.122}
+}
+
+@inproceedings{10.1109/ISCA.2006.31,
+author = {Balakrishnan, Saisanthosh and Sohi, Gurindar S.},
+title = {Program Demultiplexing: Data-Flow Based Speculative Parallelization of Methods in Sequential Programs},
+year = {2006},
+isbn = {076952608X},
+publisher = {IEEE Computer Society},
+address = {USA},
+url = {https://doi.org/10.1109/ISCA.2006.31},
+doi = {10.1109/ISCA.2006.31},
+abstract = {We present Program Demultiplexing (PD), an execution paradigm that creates concurrency
+in sequential programs by "demultiplexing" methods (functions or subroutines). Call
+sites of a demultiplexed method in the program are associated with handlers that allow
+the method to be separated from the sequential program and executed on an auxiliary
+processor. The demultiplexed execution of a method (and its handler) is speculative
+and occurs when the inputs of the method are (speculatively) available, which is typically
+far in advance of when the method is actually called in the sequential execution.
+A trigger, composed of predicates that are based on program counters and memory write
+addresses, launches the speculative execution of the method on another processor.
+Our implementation of PD is based on a full-system execution-based chip multi-processor
+simulator with software to generate triggers and handlers from an x86- program binary.
+We evaluate eight integer benchmarks from the SPEC2000 suite .programs written in
+C with no explicit concurrency and/or motivation to create concurrency. and achieve
+a harmonic mean speedup of 1.8x with our implementation of PD.},
+booktitle = {Proceedings of the 33rd Annual International Symposium on Computer Architecture},
+pages = {302–313},
+numpages = {12},
+series = {ISCA '06}
+}
+
+@article{10.1145/1150019.1136512,
+author = {Balakrishnan, Saisanthosh and Sohi, Gurindar S.},
+title = {Program Demultiplexing: Data-Flow Based Speculative Parallelization of Methods in Sequential Programs},
+year = {2006},
+issue_date = {May 2006},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+volume = {34},
+number = {2},
+issn = {0163-5964},
+url = {https://doi.org/10.1145/1150019.1136512},
+doi = {10.1145/1150019.1136512},
+abstract = {We present Program Demultiplexing (PD), an execution paradigm that creates concurrency
+in sequential programs by "demultiplexing" methods (functions or subroutines). Call
+sites of a demultiplexed method in the program are associated with handlers that allow
+the method to be separated from the sequential program and executed on an auxiliary
+processor. The demultiplexed execution of a method (and its handler) is speculative
+and occurs when the inputs of the method are (speculatively) available, which is typically
+far in advance of when the method is actually called in the sequential execution.
+A trigger, composed of predicates that are based on program counters and memory write
+addresses, launches the speculative execution of the method on another processor.
+Our implementation of PD is based on a full-system execution-based chip multi-processor
+simulator with software to generate triggers and handlers from an x86- program binary.
+We evaluate eight integer benchmarks from the SPEC2000 suite .programs written in
+C with no explicit concurrency and/or motivation to create concurrency. and achieve
+a harmonic mean speedup of 1.8x with our implementation of PD.},
+journal = {SIGARCH Comput. Archit. News},
+month = may,
+pages = {302–313},
+numpages = {12}
+}
+
+@INPROCEEDINGS{4147670, 
+authors = {Agarwal, Mayank and Malik, Kshitiz and Woley, Kevin M. and Stone, Sam S. and Frank, Matthew I.}, 
+booktitle = {2007 IEEE 13th International Symposium on High Performance Computer Architecture},
+title = {Exploiting Postdominance for Speculative Parallelization}, 
+year = {2007}, 
+volume={}, 
+number={}, 
+pages={295-305}, doi={10.1109/HPCA.2007.346207}
+} 
+
+@article{10.1016/j.parco.2010.05.006,
+author = {Rul, Sean and Vandierendonck, Hans and De Bosschere, Koen},
+title = {A Profile-Based Tool for Finding Pipeline Parallelism in Sequential Programs},
+year = {2010},
+issue_date = {September, 2010},
+publisher = {Elsevier Science Publishers B. V.},
+address = {NLD},
+volume = {36},
+number = {9},
+issn = {0167-8191},
+url = {https://doi.org/10.1016/j.parco.2010.05.006},
+doi = {10.1016/j.parco.2010.05.006},
+abstract = {Traditional static analysis fails to auto-parallelize programs with a complex control
+and data flow. Furthermore, thread-level parallelism in such programs is often restricted
+to pipeline parallelism, which can be hard to discover by a programmer. In this paper
+we propose a tool that, based on profiling information, helps the programmer to discover
+parallelism. The programmer hand-picks the code transformations from among the proposed
+candidates which are then applied by automatic code transformation techniques. This
+paper contributes to the literature by presenting a profiling tool for discovering
+thread-level parallelism. We track dependencies at the whole-data structure level
+rather than at the element level or byte level in order to limit the profiling overhead.
+We perform a thorough analysis of the needs and costs of this technique. Furthermore,
+we present and validate the belief that programs with complex control and data flow
+contain significant amounts of exploitable coarse-grain pipeline parallelism in the
+program's outer loops. This observation validates our approach to whole-data structure
+dependencies. As state-of-the-art compilers focus on loops iterating over data structure
+members, this observation also explains why our approach finds coarse-grain pipeline
+parallelism in cases that have remained out of reach for state-of-the-art compilers.
+In cases where traditional compilation techniques do find parallelism, our approach
+allows to discover higher degrees of parallelism, allowing a 40\% speedup over traditional
+compilation techniques. Moreover, we demonstrate real speedups on multiple hardware
+platforms.},
+journal = {Parallel Comput.},
+month = sep,
+pages = {531–551},
+numpages = {21},
+keywords = {Coarse-grain parallelism, Profile-based parallelization, Feedback directed analysis, Auto-parallelization, Pipeline parallelism}
+}
+
+@inproceedings{10.5555/822079.822712,
+author = {Steffan, J. and Mowry, T},
+title = {The Potential for Using Thread-Level Data Speculation to Facilitate Automatic Parallelization},
+year = {1998},
+isbn = {0818683236},
+publisher = {IEEE Computer Society},
+address = {USA},
+booktitle = {Proceedings of the 4th International Symposium on High-Performance Computer Architecture},
+pages = {2},
+series = {HPCA '98}
+}
+
+@inproceedings{10.1145/1122971.1122997,
+author = {Liu, Wei and Tuck, James and Ceze, Luis and Ahn, Wonsun and Strauss, Karin and Renau, Jose and Torrellas, Josep},
+title = {POSH: A TLS Compiler That Exploits Program Structure},
+year = {2006},
+isbn = {1595931899},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/1122971.1122997},
+doi = {10.1145/1122971.1122997},
+abstract = {As multi-core architectures with Thread-Level Speculation (TLS) are becoming better
+understood, it is important to focus on TLS compilation. TLS compilers are interesting
+in that, while they do not need to fully prove the independence of concurrent tasks,
+they make choices of where and when to generate speculative tasks that are crucial
+to overall TLS performance.This paper presents POSH, a new, fully automated TLS compiler
+built on top of gcc. POSH is based on two design decisions. First, to partition the
+code into tasks, it leverages the code structures created by the programmer, namely
+subroutines and loops. Second, it uses a simple profiling pass to discard ineffective
+tasks. With the code generated by POSH, a simulated TLS chip multiprocessor with 4
+superscalar cores delivers an average speedup of 1.30 for the SPECint 2000 applications.
+Moreover, an estimated 26\% of this speedup is a result of the implicit data prefetching
+provided by squashed tasks.},
+booktitle = {Proceedings of the Eleventh ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming},
+pages = {158–167},
+numpages = {10},
+keywords = {TLS compiler, multi-core architecture, prefetching, profiling, thread-level speculation},
+location = {New York, New York, USA},
+series = {PPoPP '06}
+}
+
+@inproceedings{10.1145/291069.291020,
+author = {Hammond, Lance and Willey, Mark and Olukotun, Kunle},
+title = {Data Speculation Support for a Chip Multiprocessor},
+year = {1998},
+isbn = {1581131070},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/291069.291020},
+doi = {10.1145/291069.291020},
+abstract = {Thread-level speculation is a technique that enables parallel execution of sequential
+applications on a multiprocessor. This paper describes the complete implementation
+of the support for threadlevel speculation on the Hydra chip multiprocessor (CMP).
+The support consists of a number of software speculation control handlers and modifications
+to the shared secondary cache memory system of the CMP This support is evaluated using
+five representative integer applications. Our results show that the speculative support
+is only able to improve performance when there is a substantial amount of medium--grained
+loop-level parallelism in the application. When the granularity of parallelism is
+too small or there is little inherent parallelism in the application, the overhead
+of the software handlers overwhelms any potential performance benefits from speculative-thread
+parallelism. Overall, thread-level speculation still appears to be a promising approach
+for expanding the class of applications that can be automatically parallelized, but
+more hardware intensive implementations for managing speculation control are required
+to achieve performance improvements on a wide class of integer applications.},
+booktitle = {Proceedings of the Eighth International Conference on Architectural Support for Programming Languages and Operating Systems},
+pages = {58–69},
+numpages = {12},
+location = {San Jose, California, USA},
+series = {ASPLOS VIII}
+}
+
+@misc{microsoft-ppl,
+author = {Microsoft},
+title = {Parallel Patterns Library (PPL)},
+url = {https://docs.microsoft.com/en-us/cpp/parallel/concrt/parallel-patterns-library-ppl?view=msvc-160},
+}
+
+@misc{intel-tbb,
+author = {Intel},
+title = {Threading Building Blocks},
+url = {http://software.intel.com/en-us/intel-tbb},
+}
+
+@misc{mpi,
+author = {MPI Forum},
+title = {Message Passing Interface},
+url = {https://www.mpi-forum.org/},
+}
+
+@misc{opencl,
+author = {Apple Inc.},
+title = {OpenCL (Open Computing Language)},
+url = {https://opencl.org/},
+}
+
+@misc{cuda,
+author = {Nvidia},
+title = {CUDA (Compute Unified Device Architecture)},
+url = {https://developer.nvidia.com/cuda-zone},
+}
+
+@misc{openmp_specs,
+author = {OpenMP Architecture Review Board},
+title = {The OpenMP API specification for parallel programming},
+url = {https://www.openmp.org/},
+}
+
+@misc{posix_specs,
+author = {ISO IEEE},
+title = {ISO/IEC/IEEE 9945:2009
+Information technology — Portable Operating System Interface (POSIX®) Base Specifications, Issue 7},
+url = {https://www.iso.org/standard/50516.html},
+year = {2021}
+}
+
 @article{10.1145/1400112.1400113,
 author = {Rangan, Ram and Vachharajani, Neil and Ottoni, Guilherme and August, David I.},
 title = {Performance Scalability of Decoupled Software Pipelining},
